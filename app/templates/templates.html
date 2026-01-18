@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Templates - ResumeGen{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Resume Templates</h1>
+        <p class="text-slate-600 dark:text-slate-300">Choose from our collection of professional, ATS-friendly templates
+        </p>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+        <!-- Template 1: Modern Clean (Current) -->
+        <div class="glass-card overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
+            data-template="modern_clean">
+            <div
+                class="aspect-[8.5/11] bg-gradient-to-br from-blue-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 p-6 relative">
+                <div class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
+                    Current
+                </div>
+                <div class="space-y-3">
+                    <div class="h-3 bg-primary/80 rounded w-3/4"></div>
+                    <div class="h-2 bg-slate-300 dark:bg-slate-600 rounded w-1/2"></div>
+                    <div class="mt-4 space-y-2">
+                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded w-5/6"></div>
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded w-2/3"></div>
+                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Modern Clean</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Clean design with blue accents</p>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-1 bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors preview-btn">
+                        Preview
+                    </button>
+                    <button
+                        class="flex-1 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors use-btn">
+                        Use Template
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 2: Professional Blue -->
+        <div class="glass-card overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
+            data-template="professional_blue">
+            <div
+                class="aspect-[8.5/11] bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900 dark:to-slate-800 p-6">
+                <div class="space-y-3">
+                    <div class="h-4 bg-blue-600 rounded w-2/3"></div>
+                    <div class="h-2 bg-blue-400 rounded w-1/2"></div>
+                    <div class="mt-4 grid grid-cols-2 gap-2">
+                        <div class="h-2 bg-slate-300 dark:bg-slate-600 rounded"></div>
+                        <div class="h-2 bg-slate-300 dark:bg-slate-600 rounded"></div>
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded w-4/5"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Professional Blue</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Corporate design with blue theme</p>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-1 bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors preview-btn">
+                        Preview
+                    </button>
+                    <button
+                        class="flex-1 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors use-btn">
+                        Use Template
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 3: Minimal Elegant -->
+        <div class="glass-card overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
+            data-template="minimal_elegant">
+            <div
+                class="aspect-[8.5/11] bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 p-6 border-l-4 border-slate-800 dark:border-slate-400">
+                <div class="space-y-3">
+                    <div class="h-3 bg-slate-800 dark:bg-slate-300 rounded w-1/2"></div>
+                    <div class="h-1 bg-slate-400 rounded w-1/3"></div>
+                    <div class="mt-6 space-y-2">
+                        <div class="h-1 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                        <div class="h-1 bg-slate-200 dark:bg-slate-600 rounded w-5/6"></div>
+                        <div class="h-1 bg-slate-200 dark:bg-slate-600 rounded w-4/5"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Minimal Elegant</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Clean minimal design</p>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-1 bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors preview-btn">
+                        Preview
+                    </button>
+                    <button
+                        class="flex-1 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors use-btn">
+                        Use Template
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 4: Creative Bold -->
+        <div class="glass-card overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
+            data-template="creative_bold">
+            <div
+                class="aspect-[8.5/11] bg-gradient-to-br from-purple-100 to-pink-50 dark:from-purple-900 dark:to-slate-800 p-6">
+                <div class="space-y-3">
+                    <div class="h-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded w-3/4"></div>
+                    <div class="h-2 bg-purple-400 rounded w-1/2"></div>
+                    <div class="mt-4 space-y-2">
+                        <div class="flex gap-2">
+                            <div class="h-2 bg-purple-300 dark:bg-purple-700 rounded flex-1"></div>
+                            <div class="h-2 bg-pink-300 dark:bg-pink-700 rounded flex-1"></div>
+                        </div>
+                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Creative Bold</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Vibrant design with personality</p>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-1 bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors preview-btn">
+                        Preview
+                    </button>
+                    <button
+                        class="flex-1 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors use-btn">
+                        Use Template
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 5: Classic Traditional -->
+        <div class="glass-card overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
+            data-template="classic_traditional">
+            <div
+                class="aspect-[8.5/11] bg-gradient-to-br from-amber-50 to-white dark:from-slate-800 dark:to-slate-900 p-6">
+                <div class="space-y-3 border-t-2 border-amber-700 dark:border-amber-500 pt-4">
+                    <div class="h-3 bg-amber-800 dark:bg-amber-600 rounded w-2/3"></div>
+                    <div class="h-2 bg-amber-600 dark:bg-amber-700 rounded w-1/2"></div>
+                    <div class="mt-4 space-y-2">
+                        <div class="h-2 bg-slate-300 dark:bg-slate-600 rounded"></div>
+                        <div class="h-2 bg-slate-300 dark:bg-slate-600 rounded w-5/6"></div>
+                        <div class="h-2 bg-slate-300 dark:bg-slate-600 rounded w-4/5"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Classic Traditional</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Timeless professional format</p>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-1 bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors preview-btn">
+                        Preview
+                    </button>
+                    <button
+                        class="flex-1 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors use-btn">
+                        Use Template
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="preview-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-700">
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100" id="modal-title">Template Preview</h3>
+            <button id="close-modal"
+                class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                <i class="fa-solid fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-80px)]" id="preview-content">
+            <!-- Preview will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const modal = document.getElementById('preview-modal');
+    const closeModal = document.getElementById('close-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const previewContent = document.getElementById('preview-content');
+
+    // Preview buttons
+    document.querySelectorAll('.preview-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const card = e.target.closest('[data-template]');
+            const templateName = card.dataset.template;
+            const templateTitle = card.querySelector('h3').textContent;
+
+            showPreview(templateName, templateTitle);
+        });
+    });
+
+    // Use template buttons
+    document.querySelectorAll('.use-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const card = e.target.closest('[data-template]');
+            const templateName = card.dataset.template;
+            const templateTitle = card.querySelector('h3').textContent;
+
+            // Disable button and show loading
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Switching...';
+
+            try {
+                const response = await axios.post('/api/templates/select', {
+                    template_name: templateName
+                });
+
+                if (response.data.success) {
+                    // Show success message
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Selected!';
+                    btn.classList.remove('border-slate-300', 'dark:border-slate-600', 'hover:bg-slate-100', 'dark:hover:bg-slate-700', 'text-slate-700', 'dark:text-slate-200');
+                    btn.classList.add('bg-green-600', 'text-white');
+
+                    // Update all other buttons to show "Use Template"
+                    document.querySelectorAll('.use-btn').forEach(otherBtn => {
+                        if (otherBtn !== btn) {
+                            otherBtn.disabled = false;
+                            otherBtn.innerHTML = 'Use Template';
+                            otherBtn.classList.remove('bg-green-600', 'text-white');
+                            otherBtn.classList.add('border', 'border-slate-300', 'dark:border-slate-600', 'hover:bg-slate-100', 'dark:hover:bg-slate-700', 'text-slate-700', 'dark:text-slate-200');
+                        }
+                    });
+
+                    // Update "Current" badge
+                    document.querySelectorAll('.absolute.top-4.right-4').forEach(badge => badge.remove());
+                    const currentBadge = document.createElement('div');
+                    currentBadge.className = 'absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium';
+                    currentBadge.textContent = 'Current';
+                    card.querySelector('.aspect-\\[8\\.5\\/11\\]').appendChild(currentBadge);
+
+                    // Show toast notification
+                    showToast(`Template switched to ${templateTitle}!`, 'success');
+
+                    // Reset button after delay
+                    setTimeout(() => {
+                        btn.disabled = false;
+                    }, 1000);
+                } else {
+                    throw new Error('Failed to switch template');
+                }
+            } catch (error) {
+                console.error('Error switching template:', error);
+                showToast('Failed to switch template. Please try again.', 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    });
+
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-0 ${type === 'success'
+            ? 'bg-green-600 text-white'
+            : 'bg-red-600 text-white'
+            }`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} text-xl"></i>
+                <span class="font-medium">${message}</span>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+        }, 10);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.style.transform = 'translateX(400px)';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+    function showPreview(templateName, templateTitle) {
+        modalTitle.textContent = `${templateTitle} - Preview`;
+        previewContent.innerHTML = '<div class="text-center py-12"><i class="fa-solid fa-spinner fa-spin text-4xl text-primary"></i></div>';
+        modal.classList.remove('hidden');
+
+        // Load actual template preview
+        fetch(`/api/templates/preview/${templateName}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load preview');
+                return response.text();
+            })
+            .then(html => {
+                // Create an iframe to display the template
+                previewContent.innerHTML = `
+                    <div class="bg-slate-100 dark:bg-slate-900 p-4 rounded-lg">
+                        <iframe 
+                            srcdoc="${html.replace(/"/g, '&quot;')}" 
+                            class="w-full bg-white rounded shadow-lg"
+                            style="height: 600px; border: none;"
+                            sandbox="allow-same-origin"
+                        ></iframe>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 text-center mt-4">
+                            <i class="fa-solid fa-info-circle"></i> This preview shows sample data. Your actual resume data will be used when you select this template.
+                        </p>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Error loading preview:', error);
+                previewContent.innerHTML = `
+                    <div class="text-center py-12 text-red-600">
+                        <i class="fa-solid fa-exclamation-triangle text-4xl mb-4"></i>
+                        <p>Failed to load template preview</p>
+                    </div>
+                `;
+            });
+    }
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

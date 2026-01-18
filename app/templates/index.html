@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header Section -->
+    <div class="text-center space-y-4">
+        <h1 class="text-4xl font-bold text-slate-900 dark:text-slate-100">Build Your Perfect Resume with AI</h1>
+        <p class="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">Create ATS-friendly resumes, get instant
+            feedback, and find
+            your dream job - all in one place.</p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Feature 1: Chat Builder -->
+        <a href="/chat" class="glass-card p-6 block hover:no-underline group">
+            <div
+                class="h-12 w-12 bg-blue-100 text-primary rounded-lg flex items-center justify-center mb-4 text-xl group-hover:bg-primary group-hover:text-white transition-colors">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">AI Chat Builder</h3>
+            <p class="text-slate-600 dark:text-slate-300">Chat with our AI to build your resume. It drafts summaries and
+                bullet points for
+                you.</p>
+        </a>
+
+        <!-- Feature 2: Resume Scorer -->
+        <a href="/scorer" class="glass-card p-6 block hover:no-underline group">
+            <div
+                class="h-12 w-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mb-4 text-xl group-hover:bg-green-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">Resume Scorer</h3>
+            <p class="text-slate-600 dark:text-slate-300">Upload your current resume and get a score out of 100 with
+                actionable
+                improvements.</p>
+        </a>
+
+        <!-- Feature 3: Cover Letter Generator -->
+        <a href="/cover-letter" class="glass-card p-6 block hover:no-underline group">
+            <div
+                class="h-12 w-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center mb-4 text-xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">Cover Letter AI</h3>
+            <p class="text-slate-600 dark:text-slate-300">Generate personalized cover letters in seconds with AI
+                assistance.</p>
+        </a>
+
+        <!-- Feature 4: Resume Templates -->
+        <a href="/templates" class="glass-card p-6 block hover:no-underline group">
+            <div
+                class="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-4 text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-palette"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">Resume Templates</h3>
+            <p class="text-slate-600 dark:text-slate-300">Choose from professional, ATS-friendly resume templates.</p>
+        </a>
+
+        <!-- Feature 5: My Profile -->
+        <a href="/profile" class="glass-card p-6 block hover:no-underline group">
+            <div
+                class="h-12 w-12 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center mb-4 text-xl group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">My Profile</h3>
+            <p class="text-slate-600 dark:text-slate-300">Manage your information and view resume history.</p>
+        </a>
+
+        <!-- Feature 6: Job Search -->
+        <a href="/jobs" class="glass-card p-6 block hover:no-underline group">
+            <div
+                class="h-12 w-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-4 text-xl group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">Job Recommendations</h3>
+            <p class="text-slate-600 dark:text-slate-300">Get real-time job suggestions that match your skills and
+                experience level.</p>
+        </a>
+    </div>
+
+    <!-- Recent Activity Section (Placeholder) -->
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Recent Activity</h2>
+        <div class="glass-card p-8 text-center text-slate-500 dark:text-slate-400">
+            <div class="mb-4">
+                <i class="fa-regular fa-folder-open text-4xl text-slate-300"></i>
+            </div>
+            <p>No resumes created yet. Start a chat to build one!</p>
+            <a href="/chat" class="inline-block mt-4 text-primary font-medium hover:text-blue-700">Start Building
+                &rarr;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

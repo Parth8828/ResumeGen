@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}AI Cover Letter Generator - ResumeGen{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">AI Cover Letter Generator</h1>
+        <p class="text-slate-600 dark:text-slate-300">Generate personalized cover letters in seconds</p>
+    </div>
+
+    <!-- Input Form -->
+    <div class="glass-card p-6">
+        <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">Job Details</h2>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Job Title *</label>
+                <input type="text" id="job-title" placeholder="e.g., Senior Software Engineer"
+                    class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Company Name *</label>
+                <input type="text" id="company-name" placeholder="e.g., Google"
+                    class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Job Description
+                    *</label>
+                <textarea id="job-description" rows="6" placeholder="Paste the job description here..."
+                    class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary resize-none transition-all"
+                    style="min-height: 150px; max-height: 400px; overflow-y: auto;"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tone</label>
+                <select id="tone-selector"
+                    class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary">
+                    <option value="professional">Professional - Formal and corporate</option>
+                    <option value="enthusiastic">Enthusiastic - Energetic and passionate</option>
+                    <option value="creative">Creative - Unique and personality-driven</option>
+                </select>
+            </div>
+
+            <button id="generate-btn"
+                class="w-full bg-primary hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Generate Cover Letter
+            </button>
+        </div>
+    </div>
+
+    <!-- Generated Cover Letter -->
+    <div id="result-section" class="hidden glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Your Cover Letter</h2>
+            <div class="flex gap-2">
+                <button id="copy-btn"
+                    class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm">
+                    <i class="fa-solid fa-copy"></i> Copy
+                </button>
+                <button id="download-btn"
+                    class="px-4 py-2 bg-primary hover:bg-blue-700 text-white rounded-lg transition-colors text-sm">
+                    <i class="fa-solid fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+
+        <textarea id="cover-letter-text" rows="20"
+            class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary font-serif text-base leading-relaxed"
+            placeholder="Your generated cover letter will appear here..."></textarea>
+
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+            <i class="fa-solid fa-info-circle"></i> You can edit the cover letter before downloading
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const jobTitleInput = document.getElementById('job-title');
+    const companyNameInput = document.getElementById('company-name');
+    const jobDescTextarea = document.getElementById('job-description');
+    const toneSelector = document.getElementById('tone-selector');
+    const generateBtn = document.getElementById('generate-btn');
+    const resultSection = document.getElementById('result-section');
+    const coverLetterText = document.getElementById('cover-letter-text');
+    const copyBtn = document.getElementById('copy-btn');
+    const downloadBtn = document.getElementById('download-btn');
+
+    // Auto-resize job description textarea
+    function autoResizeTextarea(textarea) {
+        textarea.style.height = 'auto';
+        const newHeight = Math.min(Math.max(textarea.scrollHeight, 150), 400);
+        textarea.style.height = newHeight + 'px';
+    }
+
+    jobDescTextarea.addEventListener('input', () => {
+        autoResizeTextarea(jobDescTextarea);
+    });
+
+    autoResizeTextarea(jobDescTextarea);
+
+    // Generate Cover Letter
+    generateBtn.addEventListener('click', async () => {
+        const jobTitle = jobTitleInput.value.trim();
+        const companyName = companyNameInput.value.trim();
+        const jobDescription = jobDescTextarea.value.trim();
+        const tone = toneSelector.value;
+
+        if (!jobTitle || !companyName || !jobDescription) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        // Show loading state
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+
+        try {
+            const response = await axios.post('/api/cover-letter/generate', {
+                job_title: jobTitle,
+                company_name: companyName,
+                job_description: jobDescription,
+                tone: tone
+            });
+
+            coverLetterText.value = response.data.cover_letter;
+            resultSection.classList.remove('hidden');
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to generate cover letter. Please try again.');
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Cover Letter';
+        }
+    });
+
+    // Copy to Clipboard
+    copyBtn.addEventListener('click', () => {
+        coverLetterText.select();
+        document.execCommand('copy');
+
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+        }, 2000);
+    });
+
+    // Download as PDF
+    downloadBtn.addEventListener('click', async () => {
+        const coverLetter = coverLetterText.value;
+        if (!coverLetter) {
+            alert('No cover letter to download');
+            return;
+        }
+
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating PDF...';
+
+        try {
+            const response = await axios.post('/api/cover-letter/download', {
+                cover_letter: coverLetter,
+                job_title: jobTitleInput.value,
+                company_name: companyNameInput.value
+            }, {
+                responseType: 'blob'
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Cover_Letter_${companyNameInput.value.replace(/\s+/g, '_')}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to download PDF. Please try again.');
+        } finally {
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download PDF';
+        }
+    });
+</script>
+{% endblock %}

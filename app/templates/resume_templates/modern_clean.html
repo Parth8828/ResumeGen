@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ name }} - Resume</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e3a8a;
+            text-transform: uppercase;
+        }
+
+        .contact {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2563eb;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+            padding-bottom: 2px;
+        }
+
+        .item {
+            margin-bottom: 10px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+
+        .job-title {
+            color: #0f172a;
+        }
+
+        .company {
+            color: #475569;
+        }
+
+        .date {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .list {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+
+        .list li {
+            margin-bottom: 3px;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="name">{{ name }}</div>
+        <div class="contact">
+            {{ email }} | {{ phone }}
+            {% if linkedin %} | {{ linkedin }} {% endif %}
+            {% if location %} | {{ location }} {% endif %}
+        </div>
+    </div>
+
+    {% if summary %}
+    <div class="section">
+        <div class="section-title">Professional Summary</div>
+        <div>{{ summary }}</div>
+    </div>
+    {% endif %}
+
+    {% if experience %}
+    <div class="section">
+        <div class="section-title">Experience</div>
+        {% for exp in experience %}
+        <div class="item">
+            <div class="item-header">
+                <span class="job-title">{{ exp.title }}</span>
+                <span class="date">{{ exp.start_date }} - {{ exp.end_date }}</span>
+            </div>
+            <div class="company">{{ exp.company }}</div>
+            {% if exp.description %}
+            <div style="margin-top: 5px;">{{ exp.description }}</div>
+            {% endif %}
+            {% if exp.achievements %}
+            <ul class="list">
+                {% for achievement in exp.achievements %}
+                <li>{{ achievement }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if education %}
+    <div class="section">
+        <div class="section-title">Education</div>
+        {% for edu in education %}
+        <div class="item">
+            <div class="item-header">
+                <span class="job-title">{{ edu.degree }}</span>
+                <span class="date">{{ edu.graduation_date }}</span>
+            </div>
+            <div class="company">{{ edu.institution }}</div>
+            {% if edu.gpa %}
+            <div style="margin-top: 5px;">GPA: {{ edu.gpa }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if skills %}
+    <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="skills">
+            {% for category, skill_list in skills.items() %}
+            {% for skill in skill_list %}
+            <span class="skill-tag">{{ skill }}</span>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if projects %}
+    <div class="section">
+        <div class="section-title">Projects</div>
+        {% for project in projects %}
+        <div class="item">
+            <div class="item-header">
+                <span class="job-title">{{ project.name }}</span>
+                {% if project.date %}
+                <span class="date">{{ project.date }}</span>
+                {% endif %}
+            </div>
+            <div style="margin-top: 5px;">{{ project.description }}</div>
+            {% if project.technologies %}
+            <div class="company" style="margin-top: 5px;">
+                Technologies: {{ project.technologies|join(', ') }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Resume Generator{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb', // Blue 600
+                        secondary: '#475569', // Slate 600
+                        accent: '#0f172a', // Slate 900
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-8">
+                    <a href="/" class="flex items-center gap-2">
+                        <i class="fa-solid fa-file-lines text-primary text-2xl"></i>
+                        <span class="text-xl font-bold text-slate-900 dark:text-slate-100">ResumeGen</span>
+                    </a>
+                    <div class="hidden md:flex items-center gap-1">
+                        <a href="/"
+                            class="text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Dashboard
+                        </a>
+                        <a href="/chat"
+                            class="text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Chat
+                        </a>
+                        <a href="/scorer"
+                            class="text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Scorer
+                        </a>
+                        <a href="/cover-letter"
+                            class="text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Cover Letter
+                        </a>
+                        <a href="/templates"
+                            class="text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Templates
+                        </a>
+                        <a href="/jobs"
+                            class="text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Jobs
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if user %}
+                    <div class="relative">
+                        <!-- User Menu Button -->
+                        <button id="user-menu-button"
+                            class="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg px-3 py-2 transition-colors">
+                            <span
+                                class="text-sm font-medium text-slate-700 dark:text-slate-200 hidden md:block max-w-[150px] truncate">{{
+                                user.name }}</span>
+                            <img src="{{ user.picture }}" alt="Profile"
+                                class="w-8 h-8 rounded-full border-2 border-slate-200 dark:border-slate-600">
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-400 dark:text-slate-500"></i>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="user-dropdown"
+                            class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50">
+                            <!-- User Info -->
+                            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+                                <p class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ user.name }}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">{{ user.email }}</p>
+                            </div>
+
+                            <!-- Profile Link -->
+                            <a href="/profile"
+                                class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border-b border-slate-100 dark:border-slate-700">
+                                <i class="fa-solid fa-user text-slate-600 dark:text-slate-400"></i>
+                                <span class="text-sm text-slate-700 dark:text-slate-200">My Profile</span>
+                            </a>
+
+                            <!-- Dark Mode Toggle -->
+                            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fa-solid fa-moon text-slate-600 dark:text-slate-300"></i>
+                                        <span class="text-sm text-slate-700 dark:text-slate-200">Dark Mode</span>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
+                                        <div
+                                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+
+                            <!-- AI Model Selector -->
+                            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+                                <label class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">AI
+                                    Model</label>
+                                <select id="model-selector"
+                                    class="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                    <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                                    <option value="gemini-3-flash">Gemini 3 Flash</option>
+                                </select>
+                                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Current: <span
+                                        id="current-model" class="font-medium">gemini-2.5-flash</span></p>
+                            </div>
+
+                            <!-- Logout -->
+                            <a href="/api/auth/logout"
+                                class="flex items-center gap-2 px-4 py-3 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="/login"
+                        class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Sign In
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 dark:text-slate-100">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-6 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 dark:text-slate-400 text-sm">
+            &copy; 2025 ResumeGen Chatbot. All rights reserved.
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+
+    <script>
+        // Dropdown Toggle
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        if (userMenuButton) {
+            userMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userDropdown.contains(e.target) && !userMenuButton.contains(e.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        if (darkModeToggle) {
+            // Load saved preference
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                darkModeToggle.checked = true;
+            }
+
+            darkModeToggle.addEventListener('change', () => {
+                if (darkModeToggle.checked) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('darkMode', 'false');
+                }
+            });
+        }
+
+        // Model Selector
+        const modelSelector = document.getElementById('model-selector');
+        const currentModelSpan = document.getElementById('current-model');
+        if (modelSelector) {
+            // Load saved model preference
+            const savedModel = localStorage.getItem('selectedModel') || 'gemini-2.5-flash';
+            modelSelector.value = savedModel;
+            currentModelSpan.textContent = savedModel;
+
+            modelSelector.addEventListener('change', (e) => {
+                const selectedModel = e.target.value;
+                localStorage.setItem('selectedModel', selectedModel);
+                currentModelSpan.textContent = selectedModel;
+
+                // Show toast notification
+                showToast(`AI Model changed to ${selectedModel}`, 'success');
+            });
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                }`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} text-xl"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+
+</html>

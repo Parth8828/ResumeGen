@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Scorer - ResumeGen{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-8">
+    <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">AI Resume Scorer</h2>
+        <p class="text-center text-slate-600 dark:text-slate-300 mb-8">Upload your resume or paste the text below to get
+            an instant AI analysis and score.</p>
+    </div>
+
+    <!-- Input Area -->
+    <div class="glass-card p-6">
+        <form id="score-form">
+            <!-- PDF Upload -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Upload PDF
+                    Resume</label>
+                <input type="file" id="pdf-upload" accept=".pdf" class="block w-full text-sm text-slate-500 dark:text-slate-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-lg file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-primary file:text-white
+                    hover:file:bg-blue-700 file:cursor-pointer" />
+            </div>
+
+            <div class="text-center text-slate-500 dark:text-slate-400 my-3">OR</div>
+
+            <!-- Text Input -->
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Paste Resume Text</label>
+            <textarea id="resume-text" rows="10"
+                class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary font-mono text-sm"
+                placeholder="Paste your resume content here..."></textarea>
+            <button type="submit" id="analyze-btn"
+                class="mt-4 w-full bg-primary hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex justify-center items-center gap-2">
+                Analyze Resume <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Area (Hidden by default) -->
+    <div id="results-area" class="hidden space-y-6">
+        <!-- Score Card -->
+        <div
+            class="glass-card p-8 text-center bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900">
+            <h3 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">Your Resume Score</h3>
+            <div class="relative inline-flex items-center justify-center">
+                <svg class="h-32 w-32 transform -rotate-90">
+                    <circle class="text-slate-200 dark:text-slate-700" stroke-width="8" stroke="currentColor"
+                        fill="transparent" r="58" cx="64" cy="64" />
+                    <circle id="score-circle" class="text-primary transition-all duration-1000 ease-out"
+                        stroke-width="8" stroke-dasharray="365" stroke-dashoffset="365" stroke-linecap="round"
+                        stroke="currentColor" fill="transparent" r="58" cx="64" cy="64" />
+                </svg>
+                <span id="score-val" class="absolute text-4xl font-bold text-slate-900 dark:text-slate-100">0</span>
+            </div>
+        </div>
+
+        <!-- Feedback Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Strengths -->
+            <div class="glass-card p-6">
+                <h4 class="text-green-600 dark:text-green-400 font-bold mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-check-circle"></i> Strengths</h4>
+                <ul id="strengths-list"
+                    class="space-y-2 text-sm text-slate-600 dark:text-slate-300 list-disc list-inside"></ul>
+            </div>
+            <!-- Weaknesses -->
+            <div class="glass-card p-6">
+                <h4 class="text-red-500 dark:text-red-400 font-bold mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-circle-exclamation"></i> Improvements Needed</h4>
+                <ul id="weaknesses-list"
+                    class="space-y-2 text-sm text-slate-600 dark:text-slate-300 list-disc list-inside"></ul>
+            </div>
+        </div>
+
+        <!-- Actionable Advice -->
+        <div class="glass-card p-6">
+            <h4 class="text-blue-600 dark:text-blue-400 font-bold mb-4 flex items-center gap-2"><i
+                    class="fa-solid fa-lightbulb"></i>
+                Action Plan</h4>
+            <ul id="improvements-list" class="space-y-2 text-sm text-slate-700 dark:text-slate-300"></ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const form = document.getElementById('score-form');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const resultsArea = document.getElementById('results-area');
+    const scoreVal = document.getElementById('score-val');
+    const scoreCircle = document.getElementById('score-circle');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = document.getElementById('resume-text').value;
+        if (!text) return;
+
+        // Loading State
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+
+        try {
+            const response = await axios.post('/api/resume/score', { resume_text: text });
+            const data = response.data;
+
+            // Show Results
+            resultsArea.classList.remove('hidden');
+
+            // Animate Score
+            const score = data.score || 0;
+            scoreVal.innerText = score;
+            const offset = 365 - (365 * score / 100);
+            scoreCircle.style.strokeDashoffset = offset;
+
+            // Populate Lists
+            populateList('strengths-list', data.strengths);
+            populateList('weaknesses-list', data.weaknesses);
+            populateList('improvements-list', data.improvements);
+
+        } catch (error) {
+            alert('Error analyzing resume');
+            console.error(error);
+        } finally {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = 'Analyze Resume <i class="fa-solid fa-wand-magic-sparkles"></i>';
+        }
+    });
+
+    function populateList(id, items) {
+        const el = document.getElementById(id);
+        el.innerHTML = '';
+        if (items && items.length) {
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                el.appendChild(li);
+            });
+        } else {
+            el.innerHTML = '<li>No specific feedback provided.</li>';
+        }
+    }
+</script>
+{% endblock %}

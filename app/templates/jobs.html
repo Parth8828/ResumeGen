@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Job Search - ResumeGen{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Job Recommendations</h1>
+        <p class="text-slate-600 dark:text-slate-300">Search for opportunities that match your profile.</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="glass-card p-4">
+        <form id="job-search-form" class="flex gap-4">
+            <!-- Job Title Input with Autocomplete -->
+            <div class="flex-1 relative">
+                <input type="text" id="job-query" placeholder="Job title, keywords, or company"
+                    class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary"
+                    autocomplete="off">
+                <div id="job-suggestions"
+                    class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                </div>
+            </div>
+
+            <!-- Location Input with Autocomplete -->
+            <div class="flex-1 relative">
+                <input type="text" id="job-location" placeholder="Location (e.g. Remote, NY)"
+                    class="w-full px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary"
+                    autocomplete="off">
+                <div id="location-suggestions"
+                    class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                </div>
+            </div>
+
+            <button type="submit"
+                class="bg-primary hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                Search
+            </button>
+        </form>
+    </div>
+
+    <!-- Job List -->
+    <div id="results-area" class="space-y-4">
+        <div class="text-center py-12 text-slate-500 dark:text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-4xl mb-4 text-slate-300 dark:text-slate-600"></i>
+            <p>Enter a keyword to start searching.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const form = document.getElementById('job-search-form');
+    const jobList = document.getElementById('results-area');
+    const jobQueryInput = document.getElementById('job-query');
+    const locationInput = document.getElementById('job-location');
+    const jobSuggestions = document.getElementById('job-suggestions');
+    const locationSuggestions = document.getElementById('location-suggestions');
+
+    // Comprehensive job titles for suggestions (100+ options)
+    const jobTitles = [
+        // Software & Engineering
+        'Software Developer', 'Software Engineer', 'Frontend Developer', 'Backend Developer',
+        'Full Stack Developer', 'Mobile Developer', 'iOS Developer', 'Android Developer',
+        'Web Developer', 'Game Developer', 'DevOps Engineer', 'Site Reliability Engineer',
+        'Cloud Engineer', 'Solutions Architect', 'Systems Engineer', 'Network Engineer',
+        'Security Engineer', 'Cybersecurity Analyst', 'Penetration Tester', 'QA Engineer',
+        'Test Automation Engineer', 'Database Administrator', 'Database Developer',
+
+        // Data & AI
+        'Data Scientist', 'Data Analyst', 'Data Engineer', 'Machine Learning Engineer',
+        'AI Engineer', 'Research Scientist', 'Business Intelligence Analyst', 'Analytics Manager',
+
+        // Design & Creative
+        'UX Designer', 'UI Designer', 'UX/UI Designer', 'Product Designer', 'Graphic Designer',
+        'Web Designer', 'Visual Designer', 'Motion Graphics Designer', 'Brand Designer',
+        'Creative Director', 'Art Director', 'Illustrator', '3D Artist', 'Video Editor',
+
+        // Product & Management
+        'Product Manager', 'Senior Product Manager', 'Product Owner', 'Technical Product Manager',
+        'Project Manager', 'Program Manager', 'Scrum Master', 'Agile Coach',
+        'Engineering Manager', 'Technical Lead', 'Team Lead', 'Director of Engineering',
+
+        // Marketing & Sales
+        'Marketing Manager', 'Digital Marketing Manager', 'Content Marketing Manager',
+        'Social Media Manager', 'SEO Specialist', 'SEM Specialist', 'Growth Marketer',
+        'Brand Manager', 'Marketing Coordinator', 'Sales Manager', 'Account Executive',
+        'Sales Representative', 'Business Development Manager', 'Sales Engineer',
+
+        // Business & Operations
+        'Business Analyst', 'Operations Manager', 'Supply Chain Manager', 'Logistics Coordinator',
+        'Operations Analyst', 'Strategy Consultant', 'Management Consultant',
+
+        // Finance & Accounting
+        'Accountant', 'Senior Accountant', 'Financial Analyst', 'Investment Analyst',
+        'Financial Advisor', 'Controller', 'CFO', 'Auditor', 'Tax Accountant',
+        'Bookkeeper', 'Payroll Specialist',
+
+        // HR & Recruiting
+        'HR Manager', 'Human Resources Manager', 'Recruiter', 'Technical Recruiter',
+        'Talent Acquisition Specialist', 'HR Business Partner', 'Compensation Analyst',
+        'Training Specialist', 'Employee Relations Manager',
+
+        // Customer Success & Support
+        'Customer Success Manager', 'Customer Support Representative', 'Technical Support Engineer',
+        'Customer Experience Manager', 'Account Manager', 'Client Services Manager',
+
+        // Healthcare
+        'Registered Nurse', 'Nurse Practitioner', 'Physician Assistant', 'Medical Assistant',
+        'Physical Therapist', 'Occupational Therapist', 'Pharmacist', 'Medical Technologist',
+
+        // Education
+        'Teacher', 'Professor', 'Instructor', 'Tutor', 'Curriculum Designer',
+        'Education Coordinator', 'Academic Advisor',
+
+        // Legal
+        'Attorney', 'Lawyer', 'Paralegal', 'Legal Assistant', 'Compliance Officer',
+
+        // Other
+        'Executive Assistant', 'Administrative Assistant', 'Office Manager', 'Receptionist',
+        'Content Writer', 'Technical Writer', 'Copywriter', 'Editor', 'Journalist'
+    ];
+
+    // Comprehensive locations for suggestions (100+ US cities + Remote)
+    const locations = [
+        'Remote', 'Hybrid', 'Remote - US', 'Remote - Worldwide',
+
+        // Major Tech Hubs
+        'San Francisco, CA', 'San Jose, CA', 'Palo Alto, CA', 'Mountain View, CA',
+        'Sunnyvale, CA', 'Cupertino, CA', 'Redwood City, CA', 'Oakland, CA',
+        'Seattle, WA', 'Bellevue, WA', 'Redmond, WA', 'Austin, TX', 'Boston, MA',
+        'Cambridge, MA', 'New York, NY', 'Brooklyn, NY', 'Los Angeles, CA',
+
+        // Major Cities
+        'Chicago, IL', 'Houston, TX', 'Phoenix, AZ', 'Philadelphia, PA', 'San Antonio, TX',
+        'San Diego, CA', 'Dallas, TX', 'San Jose, CA', 'Jacksonville, FL', 'Fort Worth, TX',
+        'Columbus, OH', 'Charlotte, NC', 'Indianapolis, IN', 'Denver, CO', 'Washington, DC',
+        'Nashville, TN', 'Oklahoma City, OK', 'Portland, OR', 'Las Vegas, NV', 'Detroit, MI',
+        'Memphis, TN', 'Louisville, KY', 'Baltimore, MD', 'Milwaukee, WI', 'Albuquerque, NM',
+        'Tucson, AZ', 'Fresno, CA', 'Sacramento, CA', 'Kansas City, MO', 'Mesa, AZ',
+        'Atlanta, GA', 'Omaha, NE', 'Colorado Springs, CO', 'Raleigh, NC', 'Miami, FL',
+        'Virginia Beach, VA', 'Oakland, CA', 'Minneapolis, MN', 'Tulsa, OK', 'Tampa, FL',
+        'Arlington, TX', 'New Orleans, LA', 'Wichita, KS', 'Cleveland, OH', 'Bakersfield, CA',
+        'Aurora, CO', 'Anaheim, CA', 'Honolulu, HI', 'Santa Ana, CA', 'Riverside, CA',
+        'Corpus Christi, TX', 'Lexington, KY', 'Stockton, CA', 'St. Paul, MN', 'Cincinnati, OH',
+        'Pittsburgh, PA', 'Greensboro, NC', 'Anchorage, AK', 'Plano, TX', 'Lincoln, NE',
+        'Orlando, FL', 'Irvine, CA', 'Newark, NJ', 'Durham, NC', 'Chula Vista, CA',
+        'Toledo, OH', 'Fort Wayne, IN', 'St. Petersburg, FL', 'Laredo, TX', 'Jersey City, NJ',
+        'Chandler, AZ', 'Madison, WI', 'Lubbock, TX', 'Scottsdale, AZ', 'Reno, NV',
+        'Buffalo, NY', 'Gilbert, AZ', 'Glendale, AZ', 'North Las Vegas, NV', 'Winston-Salem, NC',
+        'Chesapeake, VA', 'Norfolk, VA', 'Fremont, CA', 'Garland, TX', 'Irving, TX',
+        'Hialeah, FL', 'Richmond, VA', 'Boise, ID', 'Spokane, WA', 'Baton Rouge, LA',
+
+        // States (for broader searches)
+        'California', 'Texas', 'Florida', 'New York', 'Pennsylvania', 'Illinois',
+        'Ohio', 'Georgia', 'North Carolina', 'Michigan', 'New Jersey', 'Virginia',
+        'Washington', 'Arizona', 'Massachusetts', 'Tennessee', 'Indiana', 'Missouri',
+        'Maryland', 'Wisconsin', 'Colorado', 'Minnesota', 'South Carolina', 'Alabama'
+    ];
+
+    // Autocomplete for job titles
+    jobQueryInput.addEventListener('input', (e) => {
+        const value = e.target.value.toLowerCase();
+        if (value.length < 2) {
+            jobSuggestions.classList.add('hidden');
+            return;
+        }
+
+        const matches = jobTitles.filter(title =>
+            title.toLowerCase().includes(value)
+        ).slice(0, 8);
+
+        if (matches.length > 0) {
+            jobSuggestions.innerHTML = matches.map(title =>
+                `<div class="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-200 text-sm">${title}</div>`
+            ).join('');
+            jobSuggestions.classList.remove('hidden');
+
+            // Add click handlers
+            jobSuggestions.querySelectorAll('div').forEach(div => {
+                div.addEventListener('click', () => {
+                    jobQueryInput.value = div.textContent;
+                    jobSuggestions.classList.add('hidden');
+                });
+            });
+        } else {
+            jobSuggestions.classList.add('hidden');
+        }
+    });
+
+    // Autocomplete for locations
+    locationInput.addEventListener('input', (e) => {
+        const value = e.target.value.toLowerCase();
+        if (value.length < 2) {
+            locationSuggestions.classList.add('hidden');
+            return;
+        }
+
+        const matches = locations.filter(loc =>
+            loc.toLowerCase().includes(value)
+        ).slice(0, 8);
+
+        if (matches.length > 0) {
+            locationSuggestions.innerHTML = matches.map(loc =>
+                `<div class="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-200 text-sm">${loc}</div>`
+            ).join('');
+            locationSuggestions.classList.remove('hidden');
+
+            // Add click handlers
+            locationSuggestions.querySelectorAll('div').forEach(div => {
+                div.addEventListener('click', () => {
+                    locationInput.value = div.textContent;
+                    locationSuggestions.classList.add('hidden');
+                });
+            });
+        } else {
+            locationSuggestions.classList.add('hidden');
+        }
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!jobQueryInput.contains(e.target) && !jobSuggestions.contains(e.target)) {
+            jobSuggestions.classList.add('hidden');
+        }
+        if (!locationInput.contains(e.target) && !locationSuggestions.contains(e.target)) {
+            locationSuggestions.classList.add('hidden');
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = jobQueryInput.value;
+        const location = locationInput.value;
+
+        jobList.innerHTML = '<div class="text-center py-12"><i class="fa-solid fa-spinner fa-spin text-2xl text-primary"></i></div>';
+
+        try {
+            const response = await axios.post('/api/jobs/search', {
+                query: query,
+                location: location
+            });
+
+            const jobs = response.data;
+            renderJobs(jobs);
+
+        } catch (error) {
+            console.error(error);
+            jobList.innerHTML = '<div class="text-center py-12 text-red-500 dark:text-red-400">Error fetching jobs. Please try again.</div>';
+        }
+    });
+
+    function renderJobs(jobs) {
+        jobList.innerHTML = '';
+        if (jobs.length === 0) {
+            jobList.innerHTML = '<div class="text-center py-12 text-slate-500 dark:text-slate-400">No jobs found.</div>';
+            return;
+        }
+
+        jobs.forEach(job => {
+            const card = document.createElement('div');
+            card.className = 'glass-card p-6 flex justify-between items-start hover:shadow-lg transition-shadow';
+            card.innerHTML = `
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary mb-1">${job.title}</h3>
+                    <div class="text-sm text-slate-600 dark:text-slate-300 mb-2">
+                        <span class="font-semibold"><i class="fa-regular fa-building mr-1"></i> ${job.company}</span>
+                        <span class="mx-2">•</span>
+                        <span><i class="fa-solid fa-location-dot mr-1"></i> ${job.location}</span>
+                        ${job.remote ? '<span class="ml-2 px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full">Remote</span>' : ''}
+                    </div>
+                    <div class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 max-w-2xl">${job.description}</div>
+                </div>
+                <a href="${job.url}" target="_blank" class="flex-shrink-0 ml-4 px-4 py-2 border border-primary text-primary dark:border-blue-400 dark:text-blue-400 rounded-lg hover:bg-primary hover:text-white dark:hover:bg-blue-600 transition-colors text-sm font-medium">
+                    Apply Now
+                </a>
+            `;
+            jobList.appendChild(card);
+        });
+    }
+</script>
+{% endblock %}

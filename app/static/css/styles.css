@@ -1,0 +1,71 @@
+/* Custom Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    /* Slate 50 */
+    color: #1e293b;
+    /* Slate 800 */
+}
+
+/* Dark mode body */
+.dark body {
+    background-color: #0f172a;
+    /* Slate 900 */
+    color: #e2e8f0;
+    /* Slate 200 */
+}
+
+/* Glassmorphism Utilities */
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-card {
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+/* Dark mode glass-card */
+.dark .glass-card {
+    background: #1e293b;
+    /* Slate 800 */
+    border: 1px solid #334155;
+    /* Slate 700 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode glass-card hover */
+.dark .glass-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

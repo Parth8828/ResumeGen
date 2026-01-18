@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chat Builder - ResumeGen{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">AI Resume Builder Chat</h2>
+<div class="flex gap-6 h-[calc(100vh-12rem)]">
+    <!-- Chat Area -->
+    <div class="flex-grow glass-card flex flex-col overflow-hidden">
+        <!-- Chat Header -->
+        <div
+            class="border-b border-slate-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-800 flex justify-between items-center">
+            <h3 class="font-semibold text-slate-800 dark:text-slate-100">Chat Session</h3>
+            <button onclick="resetChat()" class="text-sm text-primary dark:text-blue-400 hover:underline"><i
+                    class="fa-solid fa-rotate-right mr-1"></i>
+                Reset</button>
+        </div>
+
+        <!-- Messages Container -->
+        <div id="chat-messages" class="flex-grow overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900">
+            <!-- AI Greeting -->
+            <div class="flex gap-3">
+                <div
+                    class="w-8 h-8 rounded-full bg-primary dark:bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
+                    <i class="fa-solid fa-robot text-xs"></i>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm max-w-2xl border border-slate-200 dark:border-slate-700">
+                    <p class="text-slate-700 dark:text-slate-200">Hello! I'm your AI Resume Assistant. I can help you
+                        build your resume from scratch. Let's start with your name and current role.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+            <form id="chat-form" class="flex gap-4 items-end">
+                <textarea id="user-input" rows="1"
+                    placeholder="Type your message... (Shift+Enter for new line, Enter to send)"
+                    class="flex-grow px-4 py-3 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 shadow-sm focus:border-primary focus:ring-primary resize-none overflow-hidden transition-all"
+                    style="min-height: 42px; max-height: 200px;" autocomplete="off"></textarea>
+                <button type="submit"
+                    class="bg-primary hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors h-[42px]">
+                    Send <i class="fa-solid fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Live Preview / Sidebar -->
+    <div class="w-1/3 glass-card p-6 hidden md:block overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold text-slate-800 dark:text-slate-100">Resume Preview</h3>
+            <button onclick="downloadPDF()"
+                class="text-xs bg-slate-800 dark:bg-slate-700 text-white px-3 py-1 rounded hover:bg-slate-900 dark:hover:bg-slate-600 transition-colors">
+                <i class="fa-solid fa-file-pdf mr-1"></i> Download PDF
+            </button>
+        </div>
+        <div
+            class="border border-slate-200 dark:border-slate-700 rounded p-4 bg-white dark:bg-slate-800 min-h-[500px] text-xs">
+            <div class="text-center border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
+                <h1 id="preview-name" class="text-lg font-bold text-slate-900 dark:text-slate-100">Your Name</h1>
+                <p id="preview-contact" class="text-slate-500 dark:text-slate-400">Contact Info</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <h4
+                        class="font-bold border-b border-slate-200 dark:border-slate-700 mb-2 text-slate-800 dark:text-slate-100">
+                        Summary</h4>
+                    <p id="preview-summary" class="text-slate-600 dark:text-slate-300">Summary will appear here...</p>
+                </div>
+                <div>
+                    <h4
+                        class="font-bold border-b border-slate-200 dark:border-slate-700 mb-2 text-slate-800 dark:text-slate-100">
+                        Experience</h4>
+                    <div id="preview-experience" class="text-slate-600 dark:text-slate-300">
+                        <p class="text-slate-400 dark:text-slate-500 italic">Experience items...</p>
+                    </div>
+                </div>
+                <div>
+                    <h4
+                        class="font-bold border-b border-slate-200 dark:border-slate-700 mb-2 text-slate-800 dark:text-slate-100">
+                        Education</h4>
+                    <div id="preview-education" class="text-slate-600 dark:text-slate-300">
+                        <p class="text-slate-400 dark:text-slate-500 italic">Education items...</p>
+                    </div>
+                </div>
+                <div>
+                    <h4
+                        class="font-bold border-b border-slate-200 dark:border-slate-700 mb-2 text-slate-800 dark:text-slate-100">
+                        Skills</h4>
+                    <div id="preview-skills" class="text-slate-600 dark:text-slate-300">
+                        <p class="text-slate-400 dark:text-slate-500 italic">Skills...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chatForm = document.getElementById('chat-form');
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+
+    // Auto-resize textarea
+    function autoResizeTextarea() {
+        userInput.style.height = 'auto';
+        userInput.style.height = Math.min(userInput.scrollHeight, 200) + 'px';
+    }
+
+    userInput.addEventListener('input', autoResizeTextarea);
+
+    // Handle Enter key (submit) vs Shift+Enter (new line)
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    // Simple Chat Logic (Connect to API later)
+    let userId = 1; // Mock ID
+    let sessionId = null;
+
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = userInput.value.trim();
+        if (!msg) return;
+
+        // User Message UI
+        appendMessage('user', msg);
+        userInput.value = '';
+        autoResizeTextarea(); // Reset height after sending
+
+        try {
+            // Get selected model from localStorage
+            const selectedModel = localStorage.getItem('selectedModel') || 'gemini-2.5-flash';
+
+            // Call API
+            const response = await axios.post('/api/chat/message', {
+                user_id: userId,
+                session_id: sessionId,
+                message: msg,
+                model: selectedModel
+            });
+
+            const data = response.data;
+            sessionId = data.session_id;
+            appendMessage('model', data.message);
+
+            // Update preview if data exists
+            if (data.profile_data) {
+                updatePreview(data.profile_data);
+            }
+
+        } catch (error) {
+            console.error(error);
+            appendMessage('model', "Sorry, I couldn't reach the server.");
+        }
+    });
+
+    function appendMessage(role, text) {
+        const isUser = role === 'user';
+        const div = document.createElement('div');
+        div.className = `flex gap-4 ${isUser ? 'flex-row-reverse' : ''}`;
+
+        div.innerHTML = `
+            <div class="w-8 h-8 rounded-full ${isUser ? 'bg-slate-500' : 'bg-primary'} flex items-center justify-center text-white flex-shrink-0">
+                <i class="fa-solid fa-${isUser ? 'user' : 'robot'} text-xs"></i>
+            </div>
+            <div class="${isUser ? 'bg-primary text-white' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700'} rounded-lg p-4 shadow-sm max-w-2xl">
+                <p class="${isUser ? 'text-white' : 'text-slate-700 dark:text-slate-200'}">${text}</p>
+            </div>
+        `;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        let bgColor = 'bg-blue-600';
+        let icon = 'fa-info-circle';
+
+        if (type === 'success') {
+            bgColor = 'bg-green-600';
+            icon = 'fa-check-circle';
+        } else if (type === 'error') {
+            bgColor = 'bg-red-600';
+            icon = 'fa-times-circle';
+        }
+
+        toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg ${bgColor} text-white`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <i class="fa-solid ${icon} text-xl"></i>
+                <span class="font-medium">${message}</span>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function resetChat() {
+        // Clear chat messages
+        chatMessages.innerHTML = '';
+
+        // Reset session ID to start new conversation
+        sessionId = null;
+
+        // Add initial greeting
+        const greetingDiv = document.createElement('div');
+        greetingDiv.className = 'flex gap-4';
+        greetingDiv.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0">
+                <i class="fa-solid fa-robot text-xs"></i>
+            </div>
+            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 shadow-sm max-w-2xl">
+                <p class="text-slate-700 dark:text-slate-200">Hello! I'm your AI Resume Assistant. I can help you build your resume, optimize your content, and prepare for interviews. What would you like to do today?</p>
+            </div>
+        `;
+        chatMessages.appendChild(greetingDiv);
+
+        showToast('Chat history cleared', 'success');
+    }
+
+    // NEW: Load existing profile data on page load
+    async function loadInitialData() {
+        try {
+            const response = await axios.get('/api/profile');
+            const p = response.data;
+
+            // Adapt API response to flat format expected by updatePreview
+            const flatData = {
+                full_name: p.profile.full_name,
+                email: p.profile.email,
+                phone: p.profile.phone,
+                location: p.profile.location,
+                summary: p.profile.summary,
+                experience: p.experiences || [],
+                education: p.education || [],
+                skills: p.skills ? p.skills.flatMap(cat => cat.skills) : [], // Flatten skills
+                projects: p.projects || []
+            };
+
+            updatePreview(flatData);
+            console.log("Initial profile data loaded");
+        } catch (error) {
+            console.log("No existing profile or error loading:", error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadInitialData();
+    });
+
+    // Resume Data State
+    let currentResumeData = {
+        full_name: "",
+        email: "",
+        phone: "",
+        summary: "",
+        education: [],
+        experience: [],
+        skills: [],
+        projects: []
+    };
+
+    function updatePreview(data) {
+        if (!data) return;
+        currentResumeData = data; // Update state
+
+        // Update Name & Contact
+        const nameEl = document.getElementById('preview-name');
+        const contactEl = document.getElementById('preview-contact');
+        if (data.full_name) nameEl.textContent = data.full_name;
+
+        let contactParts = [];
+        if (data.email) contactParts.push(data.email);
+        if (data.phone) contactParts.push(data.phone);
+        if (data.location) contactParts.push(data.location);
+        contactEl.textContent = contactParts.join(' | ') || "Contact Info";
+
+        // Update Summary
+        const summaryEl = document.getElementById('preview-summary');
+        if (data.summary) {
+            summaryEl.textContent = data.summary;
+            summaryEl.classList.remove('italic', 'text-slate-400');
+        }
+
+        // Update Experience
+        const expEl = document.getElementById('preview-experience');
+        if (data.experience && data.experience.length > 0) {
+            expEl.innerHTML = data.experience.map(exp => `
+                <div class="mb-2">
+                    <p class="font-semibold text-slate-800 dark:text-slate-200">${exp.title} - ${exp.company}</p>
+                    <p class="text-[10px] text-slate-500">${exp.start_date} - ${exp.end_date}</p>
+                </div>
+            `).join('');
+        }
+
+        // Update Education
+        const eduEl = document.getElementById('preview-education');
+        if (data.education && data.education.length > 0) {
+            eduEl.innerHTML = data.education.map(edu => `
+                <div class="mb-2">
+                    <p class="font-semibold text-slate-800 dark:text-slate-200">${edu.degree}</p>
+                    <p class="text-[10px] text-slate-500">${edu.institution} (${edu.graduation_date})</p>
+                </div>
+            `).join('');
+        }
+
+        // Update Skills
+        const skillsEl = document.getElementById('preview-skills');
+        if (data.skills && data.skills.length > 0) {
+            skillsEl.innerHTML = `<p class="text-xs">${data.skills.join(', ')}</p>`;
+        }
+    }
+
+    function resetChat() {
+        // Clear chat messages
+        chatMessages.innerHTML = '';
+
+        // Reset session ID to start new conversation
+        sessionId = null;
+
+        // Re-add welcome message
+        appendMessage('model', 'Hello! 👋 I\'m your AI Resume Assistant. I\'m here to help you build an amazing resume. Tell me about your experience, skills, education, and career goals, and I\'ll guide you through creating a professional resume that stands out!');
+
+        // Show confirmation
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg bg-green-600 text-white';
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-check-circle text-xl"></i>
+                <span class="font-medium">Chat reset! Starting new conversation.</span>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    async function downloadPDF() {
+        try {
+            const btn = document.querySelector('button[onclick="downloadPDF()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+            btn.disabled = true;
+
+            const response = await axios.post('/api/resume/generate/pdf', currentResumeData, {
+                responseType: 'blob'
+            });
+
+            // Create download link
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'resume.pdf');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        } catch (error) {
+            console.error(error);
+            alert("Failed to generate PDF. Please try again.");
+            const btn = document.querySelector('button[onclick="downloadPDF()"]');
+            btn.innerHTML = '<i class="fa-solid fa-file-pdf mr-1"></i> Download PDF';
+            btn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

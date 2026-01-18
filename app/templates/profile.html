@@ -1,0 +1,534 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - ResumeGen{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100">My Profile</h1>
+        <button id="save-all-btn"
+            class="hidden bg-primary hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+            <i class="fa-solid fa-save mr-2"></i>Save All Changes
+        </button>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Personal Information</h2>
+            <button id="edit-personal-btn" class="text-primary hover:text-blue-700 font-medium">
+                <i class="fa-solid fa-edit mr-1"></i>Edit
+            </button>
+        </div>
+
+        <div id="personal-view" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="text-sm text-slate-600 dark:text-slate-400">Full Name</label>
+                <p id="view-name" class="text-slate-900 dark:text-slate-100">-</p>
+            </div>
+            <div>
+                <label class="text-sm text-slate-600 dark:text-slate-400">Email</label>
+                <p id="view-email" class="text-slate-900 dark:text-slate-100">-</p>
+            </div>
+            <div>
+                <label class="text-sm text-slate-600 dark:text-slate-400">Phone</label>
+                <p id="view-phone" class="text-slate-900 dark:text-slate-100">-</p>
+            </div>
+            <div>
+                <label class="text-sm text-slate-600 dark:text-slate-400">Location</label>
+                <p id="view-location" class="text-slate-900 dark:text-slate-100">-</p>
+            </div>
+            <div>
+                <label class="text-sm text-slate-600 dark:text-slate-400">LinkedIn</label>
+                <p id="view-linkedin" class="text-slate-900 dark:text-slate-100">-</p>
+            </div>
+            <div>
+                <label class="text-sm text-slate-600 dark:text-slate-400">GitHub</label>
+                <p id="view-github" class="text-slate-900 dark:text-slate-100">-</p>
+            </div>
+        </div>
+
+        <form id="personal-form" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+                <input type="text" id="input-name"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+                <input type="email" id="input-email"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Phone</label>
+                <input type="tel" id="input-phone"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Location</label>
+                <input type="text" id="input-location"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">LinkedIn</label>
+                <input type="url" id="input-linkedin"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">GitHub</label>
+                <input type="url" id="input-github"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+            </div>
+            <div class="md:col-span-2 flex gap-2 justify-end">
+                <button type="button" id="cancel-personal-btn"
+                    class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Professional Summary -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Professional Summary</h2>
+            <button id="edit-summary-btn" class="text-primary hover:text-blue-700 font-medium">
+                <i class="fa-solid fa-edit mr-1"></i>Edit
+            </button>
+        </div>
+
+        <div id="summary-view">
+            <p id="view-summary" class="text-slate-700 dark:text-slate-300">No summary added yet.</p>
+        </div>
+
+        <form id="summary-form" class="hidden">
+            <textarea id="input-summary" rows="4"
+                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+                placeholder="Write a compelling professional summary..."></textarea>
+            <div class="flex gap-2 justify-end mt-2">
+                <button type="button" id="cancel-summary-btn"
+                    class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Experience -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Experience</h2>
+            <button id="add-experience-btn"
+                class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
+                <i class="fa-solid fa-plus mr-1"></i>Add Experience
+            </button>
+        </div>
+
+        <div id="experience-list" class="space-y-4">
+            <!-- Experience items will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Education -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Education</h2>
+            <button id="add-education-btn"
+                class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
+                <i class="fa-solid fa-plus mr-1"></i>Add Education
+            </button>
+        </div>
+
+        <div id="education-list" class="space-y-4">
+            <!-- Education items will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Skills</h2>
+            <button id="add-skill-btn" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
+                <i class="fa-solid fa-plus mr-1"></i>Add Skill Category
+            </button>
+        </div>
+
+        <div id="skills-list" class="space-y-4">
+            <!-- Skills will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Projects</h2>
+            <button id="add-project-btn"
+                class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
+                <i class="fa-solid fa-plus mr-1"></i>Add Project
+            </button>
+        </div>
+
+        <div id="projects-list" class="space-y-4">
+            <!-- Projects will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Resume History -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Resume History</h2>
+            <div class="flex gap-2">
+                <button id="filter-favorites-btn"
+                    class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <i class="fa-solid fa-star mr-1"></i>Favorites Only
+                </button>
+            </div>
+        </div>
+
+        <div id="resume-history-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Resume history will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loading" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-slate-800 p-6 rounded-lg">
+        <i class="fa-solid fa-spinner fa-spin text-4xl text-primary"></i>
+        <p class="mt-2 text-slate-700 dark:text-slate-300">Loading...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let profileData = {};
+
+    // Load profile data on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadProfile();
+    });
+
+    async function loadProfile() {
+        try {
+            const response = await axios.get('/api/profile');
+            profileData = response.data;
+
+            // Populate personal info
+            document.getElementById('view-name').textContent = profileData.profile.full_name || '-';
+            document.getElementById('view-email').textContent = profileData.profile.email || '-';
+            document.getElementById('view-phone').textContent = profileData.profile.phone || '-';
+            document.getElementById('view-location').textContent = profileData.profile.location || '-';
+            document.getElementById('view-linkedin').textContent = profileData.profile.linkedin || '-';
+            document.getElementById('view-github').textContent = profileData.profile.github || '-';
+
+            // Populate summary
+            document.getElementById('view-summary').textContent = profileData.profile.summary || 'No summary added yet.';
+
+            // Load experiences
+            renderExperiences();
+
+            // Load education
+            renderEducation();
+
+            // Load skills
+            renderSkills();
+
+            // Load projects
+            renderProjects();
+
+            // Load resume history
+            await loadResumeHistory();
+
+        } catch (error) {
+            console.error('Error loading profile:', error);
+            showToast('Failed to load profile', 'error');
+        }
+    }
+
+    // Personal Info Edit
+    document.getElementById('edit-personal-btn').addEventListener('click', () => {
+        document.getElementById('personal-view').classList.add('hidden');
+        document.getElementById('personal-form').classList.remove('hidden');
+
+        // Populate form
+        document.getElementById('input-name').value = profileData.profile.full_name || '';
+        document.getElementById('input-email').value = profileData.profile.email || '';
+        document.getElementById('input-phone').value = profileData.profile.phone || '';
+        document.getElementById('input-location').value = profileData.profile.location || '';
+        document.getElementById('input-linkedin').value = profileData.profile.linkedin || '';
+        document.getElementById('input-github').value = profileData.profile.github || '';
+    });
+
+    document.getElementById('cancel-personal-btn').addEventListener('click', () => {
+        document.getElementById('personal-form').classList.add('hidden');
+        document.getElementById('personal-view').classList.remove('hidden');
+    });
+
+    document.getElementById('personal-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = {
+            full_name: document.getElementById('input-name').value,
+            email: document.getElementById('input-email').value,
+            phone: document.getElementById('input-phone').value,
+            location: document.getElementById('input-location').value,
+            linkedin: document.getElementById('input-linkedin').value,
+            github: document.getElementById('input-github').value
+        };
+
+        try {
+            await axios.put('/api/profile', data);
+            showToast('Personal information updated!', 'success');
+            await loadProfile();
+            document.getElementById('personal-form').classList.add('hidden');
+            document.getElementById('personal-view').classList.remove('hidden');
+        } catch (error) {
+            showToast('Failed to update personal information', 'error');
+        }
+    });
+
+    // Summary Edit
+    document.getElementById('edit-summary-btn').addEventListener('click', () => {
+        document.getElementById('summary-view').classList.add('hidden');
+        document.getElementById('summary-form').classList.remove('hidden');
+        document.getElementById('input-summary').value = profileData.profile.summary || '';
+    });
+
+    document.getElementById('cancel-summary-btn').addEventListener('click', () => {
+        document.getElementById('summary-form').classList.add('hidden');
+        document.getElementById('summary-view').classList.remove('hidden');
+    });
+
+    document.getElementById('summary-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        try {
+            await axios.put('/api/profile', {
+                summary: document.getElementById('input-summary').value
+            });
+            showToast('Summary updated!', 'success');
+            await loadProfile();
+            document.getElementById('summary-form').classList.add('hidden');
+            document.getElementById('summary-view').classList.remove('hidden');
+        } catch (error) {
+            showToast('Failed to update summary', 'error');
+        }
+    });
+
+    function renderExperiences() {
+        const container = document.getElementById('experience-list');
+        if (profileData.experiences.length === 0) {
+            container.innerHTML = '<p class="text-slate-500 dark:text-slate-400">No experience added yet.</p>';
+            return;
+        }
+
+        container.innerHTML = profileData.experiences.map(exp => `
+        <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-slate-900 dark:text-slate-100">${exp.title}</h3>
+                    <p class="text-primary">${exp.company}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">${exp.start_date} - ${exp.end_date}</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="editExperience(${exp.id})" class="text-blue-600 hover:text-blue-800">
+                        <i class="fa-solid fa-edit"></i>
+                    </button>
+                    <button onclick="deleteExperience(${exp.id})" class="text-red-600 hover:text-red-800">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            ${exp.description ? `<p class="mt-2 text-slate-700 dark:text-slate-300">${exp.description}</p>` : ''}
+            ${exp.achievements && exp.achievements.length > 0 ? `
+                <ul class="mt-2 list-disc list-inside text-slate-700 dark:text-slate-300">
+                    ${exp.achievements.map(a => `<li>${a}</li>`).join('')}
+                </ul>
+            ` : ''}
+        </div>
+    `).join('');
+    }
+
+    function renderEducation() {
+        const container = document.getElementById('education-list');
+        if (profileData.education.length === 0) {
+            container.innerHTML = '<p class="text-slate-500 dark:text-slate-400">No education added yet.</p>';
+            return;
+        }
+
+        container.innerHTML = profileData.education.map(edu => `
+        <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-slate-900 dark:text-slate-100">${edu.degree}</h3>
+                    <p class="text-primary">${edu.institution}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">${edu.graduation_date}</p>
+                    ${edu.gpa ? `<p class="text-sm text-slate-600 dark:text-slate-400">GPA: ${edu.gpa}</p>` : ''}
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="editEducation(${edu.id})" class="text-blue-600 hover:text-blue-800">
+                        <i class="fa-solid fa-edit"></i>
+                    </button>
+                    <button onclick="deleteEducation(${edu.id})" class="text-red-600 hover:text-red-800">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    function renderSkills() {
+        const container = document.getElementById('skills-list');
+        if (profileData.skills.length === 0) {
+            container.innerHTML = '<p class="text-slate-500 dark:text-slate-400">No skills added yet.</p>';
+            return;
+        }
+
+        container.innerHTML = profileData.skills.map(skill => `
+        <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="font-semibold text-slate-900 dark:text-slate-100">${skill.category}</h3>
+                <div class="flex gap-2">
+                    <button onclick="editSkill(${skill.id})" class="text-blue-600 hover:text-blue-800">
+                        <i class="fa-solid fa-edit"></i>
+                    </button>
+                    <button onclick="deleteSkill(${skill.id})" class="text-red-600 hover:text-red-800">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                ${skill.skills.map(s => `
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">${s}</span>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+    }
+
+    function renderProjects() {
+        const container = document.getElementById('projects-list');
+        if (profileData.projects.length === 0) {
+            container.innerHTML = '<p class="text-slate-500 dark:text-slate-400">No projects added yet.</p>';
+            return;
+        }
+
+        container.innerHTML = profileData.projects.map(proj => `
+        <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-slate-900 dark:text-slate-100">${proj.name}</h3>
+                    ${proj.date ? `<p class="text-sm text-slate-600 dark:text-slate-400">${proj.date}</p>` : ''}
+                    <p class="mt-2 text-slate-700 dark:text-slate-300">${proj.description}</p>
+                    ${proj.technologies && proj.technologies.length > 0 ? `
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            ${proj.technologies.map(t => `
+                                <span class="px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs">${t}</span>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="editProject(${proj.id})" class="text-blue-600 hover:text-blue-800">
+                        <i class="fa-solid fa-edit"></i>
+                    </button>
+                    <button onclick="deleteProject(${proj.id})" class="text-red-600 hover:text-red-800">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    async function loadResumeHistory() {
+        try {
+            const response = await axios.get('/api/profile/resume-history');
+            const container = document.getElementById('resume-history-grid');
+
+            if (response.data.resumes.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 dark:text-slate-400 col-span-full">No resumes generated yet.</p>';
+                return;
+            }
+
+            container.innerHTML = response.data.resumes.map(resume => `
+            <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-semibold text-slate-900 dark:text-slate-100">${resume.title}</h3>
+                    <button onclick="toggleFavorite(${resume.id}, ${resume.is_favorite})" class="text-yellow-500 hover:text-yellow-600">
+                        <i class="fa-${resume.is_favorite ? 'solid' : 'regular'} fa-star"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-slate-600 dark:text-slate-400">Template: ${resume.template_used}</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400">Created: ${new Date(resume.created_at).toLocaleDateString()}</p>
+                <div class="flex gap-2 mt-4">
+                    <a href="${resume.file_path}" download class="flex-1 text-center px-3 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">
+                        <i class="fa-solid fa-download mr-1"></i>Download
+                    </a>
+                    <button onclick="deleteResume(${resume.id})" class="px-3 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-sm">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        } catch (error) {
+            console.error('Error loading resume history:', error);
+        }
+    }
+
+    // Placeholder functions for add/edit/delete (to be implemented with modals)
+    function editExperience(id) { alert('Edit experience modal - to be implemented'); }
+    function deleteExperience(id) { if (confirm('Delete this experience?')) { /* API call */ } }
+    function editEducation(id) { alert('Edit education modal - to be implemented'); }
+    function deleteEducation(id) { if (confirm('Delete this education?')) { /* API call */ } }
+    function editSkill(id) { alert('Edit skill modal - to be implemented'); }
+    function deleteSkill(id) { if (confirm('Delete this skill category?')) { /* API call */ } }
+    function editProject(id) { alert('Edit project modal - to be implemented'); }
+    function deleteProject(id) { if (confirm('Delete this project?')) { /* API call */ } }
+
+    async function toggleFavorite(id, currentStatus) {
+        try {
+            await axios.put(`/api/profile/resume-history/${id}/favorite`);
+            await loadResumeHistory();
+        } catch (error) {
+            showToast('Failed to update favorite', 'error');
+        }
+    }
+
+    async function deleteResume(id) {
+        if (!confirm('Delete this resume?')) return;
+
+        try {
+            await axios.delete(`/api/profile/resume-history/${id}`);
+            showToast('Resume deleted', 'success');
+            await loadResumeHistory();
+        } catch (error) {
+            showToast('Failed to delete resume', 'error');
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+            }`;
+        toast.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} text-xl"></i>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>
+{% endblock %}

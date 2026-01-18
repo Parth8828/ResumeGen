@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+jinja2
+sqlite-utils
+sqlalchemy
+pydantic
+pydantic-settings
+google-genai
+python-multipart
+itsdangerous
+python-docx
+pdfkit
+requests
