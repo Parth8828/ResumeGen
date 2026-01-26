@@ -161,7 +161,7 @@ class AIService:
             response = await chat.send_message(user_message)
             
             # DEBUG PRINT
-            print(f"RAW AI RESPONSE ({client._api_key[:5]}...): {response.text}") # Verify rotation
+            print(f"RAW AI RESPONSE: {response.text}") # Verify rotation
 
             try:
                 # Parse JSON
@@ -175,7 +175,7 @@ class AIService:
             return await self._execute_with_retry(_attempt_chat)
         except Exception as e:
             print(f"Error calling Gemini: {e}")
-            return {"message": f"Sorry, I encountered an error: {str(e)}", "extracted_data": None}
+            return {"message": "I apologize, but I'm encountering some technical difficulties. Please try sending your message again.", "extracted_data": None}
 
 
     async def generate_resume_content(self, user_data: dict) -> str:
@@ -360,6 +360,48 @@ class AIService:
             return await self._execute_with_retry(_attempt_gen_generic)
         except Exception as e:
             return f"Error generating content: {str(e)}"
+
+    async def suggest_jobs(self, profile_context: str) -> dict:
+        """
+        Suggests job titles and companies based on profile.
+        Returns: { "suggestions": [ {"role": "...", "company": "...", "reason": "..."} ] }
+        """
+        prompt = f"""
+        Act as a Career Counselor. Based on this candidate's profile:
+        {profile_context}
+        
+        Suggest 3 suitable Job Roles and Types of Companies (or specific top companies) they should apply to.
+        For each suggestion, also write a "Typical Job Description" (3-4 sentences) that matches this role and key skills.
+        
+        Output JSON exactly like this:
+        {{
+            "suggestions": [
+                {{
+                    "role": "Job Title",
+                    "company": "Company Name or Type",
+                    "reason": "Brief reason why",
+                    "description": "Typical job description text..."
+                }}
+            ]
+        }}
+        """
+        
+        async def _attempt_suggest(client):
+            response = await client.aio.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            return json.loads(response.text)
+
+        try:
+            return await self._execute_with_retry(_attempt_suggest)
+        except Exception as e:
+            print(f"Error suggesting jobs: {e}")
+            return {"suggestions": []}
+
 
 
 # Singleton instance

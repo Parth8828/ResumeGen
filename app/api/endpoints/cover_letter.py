@@ -171,13 +171,59 @@ async def download_cover_letter(request: CoverLetterDownloadRequest):
         # Get PDF data
         buffer.seek(0)
         
+        # Sanitize filename
+        import re
+        safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', request.company_name)
+        if not safe_name:
+            safe_name = "Cover_Letter"
+            
+        print(f"PDF Generated. Size: {len(buffer.getvalue())} bytes. Filename: {safe_name}.pdf")
+
         return StreamingResponse(
             buffer,
             media_type="application/pdf",
             headers={
-                "Content-Disposition": f"attachment; filename=Cover_Letter_{request.company_name.replace(' ', '_')}.pdf"
+                "Content-Disposition": f"attachment; filename=Cover_Letter_{safe_name}.pdf"
             }
         )
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate PDF: {str(e)}")
+
+@router.post("/suggestions")
+async def suggest_roles_and_companies(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Suggest job roles and companies based on profile"""
+    try:
+        # Get resume_context from body manual check or just fetch from DB
+        body = await request.json()
+        resume_context = body.get("resume_context", "")
+
+        candidate_info = ""
+        if resume_context and resume_context.strip():
+             candidate_info = resume_context
+        else:
+            # Fallback to DB
+            profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+            experiences = db.query(Experience).filter(Experience.user_id == current_user.id).all()
+            skills = db.query(Skill).filter(Skill.user_id == current_user.id).all()
+            
+            candidate_data = {
+                "name": profile.full_name if profile else "Candidate",
+                "summary": profile.summary if profile else "",
+                "experience": [e.title for e in experiences],
+                "skills": [s.category + ": " + ", ".join(s.skills) for s in skills]
+            }
+            candidate_info = json.dumps(candidate_data, indent=2)
+
+        ai_service = AIService()
+        suggestions = await ai_service.suggest_jobs(candidate_info)
+        return suggestions
+
+    except Exception as e:
+        print(f"Suggestion error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get suggestions: {str(e)}")
+

@@ -1130,5 +1130,10 @@
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadProfile();
+        await loadResumeHistory();
+    });
 </script>
 {% endblock %}
