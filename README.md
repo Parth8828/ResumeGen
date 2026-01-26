@@ -69,7 +69,7 @@ You must create a `.env` file in the root directory to store your secret keys.
 GEMINI_API_KEYS=key1,key2,key3...
 
 # 2. Google Gemini Model Name
-GEMINI_MODEL_NAME=gemini-2.0-flash-exp
+GEMINI_MODEL_NAME=gemini-2.5-flash
 
 # 3. Email Configuration (For sending resumes)
 # Use a Gmail App Password, NOT your regular password.
