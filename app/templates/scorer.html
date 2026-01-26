@@ -96,15 +96,36 @@
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const text = document.getElementById('resume-text').value;
-        if (!text) return;
+        const textInput = document.getElementById('resume-text');
+        const fileInput = document.getElementById('pdf-upload');
+
+        const text = textInput.value.trim();
+        const file = fileInput.files[0];
+
+        if (!text && !file) {
+            alert('Please either upload a PDF or paste resume text.');
+            return;
+        }
 
         // Loading State
         analyzeBtn.disabled = true;
         analyzeBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+        resultsArea.classList.add('hidden'); // Hide previous results
 
         try {
-            const response = await axios.post('/api/resume/score', { resume_text: text });
+            let response;
+            if (file) {
+                // PDF Upload Flow
+                const formData = new FormData();
+                formData.append('file', file);
+                response = await axios.post('/api/resume/score_pdf', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+            } else {
+                // Text Flow
+                response = await axios.post('/api/resume/score', { resume_text: text });
+            }
+
             const data = response.data;
 
             // Show Results
@@ -113,8 +134,15 @@
             // Animate Score
             const score = data.score || 0;
             scoreVal.innerText = score;
+            // 365 is the stroke-dasharray value for the circle
             const offset = 365 - (365 * score / 100);
             scoreCircle.style.strokeDashoffset = offset;
+
+            // Color code the circle
+            scoreCircle.classList.remove('text-green-500', 'text-yellow-500', 'text-red-500', 'text-primary');
+            if (score >= 80) scoreCircle.classList.add('text-green-500');
+            else if (score >= 50) scoreCircle.classList.add('text-yellow-500');
+            else scoreCircle.classList.add('text-red-500');
 
             // Populate Lists
             populateList('strengths-list', data.strengths);
@@ -122,7 +150,7 @@
             populateList('improvements-list', data.improvements);
 
         } catch (error) {
-            alert('Error analyzing resume');
+            alert('Error analyzing resume. Please try again.');
             console.error(error);
         } finally {
             analyzeBtn.disabled = false;

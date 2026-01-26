@@ -16,3 +16,7 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Generated Assets
+app/static/generated_resumes/
+*.pdf

@@ -7,9 +7,15 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # GEMINI AI
-    GEMINI_API_KEY: str = "" # Defaults to empty, should be set in env or .env file
-    GEMINI_MODEL_NAME: str = "gemini-2.5-flash" # Default model
+    GEMINI_API_KEYS: str = "" # Comma-separated list
+    GEMINI_MODEL_NAME: str = "gemini-2.5-flash" 
     
+    @property
+    def api_keys(self) -> list[str]:
+        if self.GEMINI_API_KEYS:
+            return [k.strip() for k in self.GEMINI_API_KEYS.split(',') if k.strip()]
+        return []
+
     # Database
     DATABASE_URL: str = "sqlite:///./resume_gen.db"
 

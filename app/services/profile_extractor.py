@@ -5,13 +5,21 @@ from google.genai import types
 from app.core.config import get_settings
 
 settings = get_settings()
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
+import random
 
 class ProfileExtractor:
     """Service to extract structured profile data from chat conversations"""
     
     def __init__(self):
-        self.model_id = 'gemini-2.0-flash-exp'
+        self.model_id = 'gemini-2.0-flash-exp' # or settings.GEMINI_MODEL_NAME
+        self.api_keys = settings.api_keys
+        if self.api_keys:
+             # Pick random key for now, or just first one
+             self.client = genai.Client(api_key=random.choice(self.api_keys))
+        else:
+             print("WARNING: No API Keys found for ProfileExtractor")
+             self.client = None
     
     def extract_from_message(self, message: str, existing_profile: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
@@ -100,7 +108,7 @@ Response: {{"education": [{{"degree": "Bachelor of Science in Computer Science",
 Return ONLY valid JSON, no explanations."""
 
         try:
-            response = client.models.generate_content(
+            response = self.client.models.generate_content(
                 model=self.model_id,
                 contents=prompt
             )

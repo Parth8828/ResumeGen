@@ -11,3 +11,4 @@ itsdangerous
 python-docx
 pdfkit
 requests
+pypdf

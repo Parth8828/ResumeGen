@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from app.services.ai_service import AIService
@@ -9,14 +9,30 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.enums import TA_LEFT
 import io
 from datetime import datetime
+from sqlalchemy.orm import Session
+from app.db.database import get_db
+from app.models.models import User, UserProfile, Experience, Skill, Project, Education
+from fastapi import Request
+import json
 
 router = APIRouter()
+
+# Dependency (Copied for stability, should be shared)
+def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
+    user_data = request.session.get("user")
+    if not user_data:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    user = db.query(User).filter(User.email == user_data["email"]).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
 
 class CoverLetterRequest(BaseModel):
     job_title: str
     company_name: str
     job_description: str
     tone: str = "professional"
+    resume_context: str | None = None
 
 class CoverLetterDownloadRequest(BaseModel):
     cover_letter: str
@@ -24,9 +40,46 @@ class CoverLetterDownloadRequest(BaseModel):
     company_name: str
 
 @router.post("/generate")
-async def generate_cover_letter(request: CoverLetterRequest):
-    """Generate a personalized cover letter using AI"""
+async def generate_cover_letter(
+    request: CoverLetterRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Generate a personalized cover letter using AI and User Profile"""
     try:
+        candidate_info = ""
+
+        if request.resume_context and request.resume_context.strip():
+             # User provided/edited context
+             candidate_info = request.resume_context
+        else:
+            # Fallback to fetching User Profile Data from DB
+            profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+            experiences = db.query(Experience).filter(Experience.user_id == current_user.id).all()
+            skills = db.query(Skill).filter(Skill.user_id == current_user.id).all()
+            projects = db.query(Project).filter(Project.user_id == current_user.id).all()
+            education = db.query(Education).filter(Education.user_id == current_user.id).all()
+
+            # format data for prompt
+            candidate_data = {
+                "name": profile.full_name if profile else "Candidate",
+                "summary": profile.summary if profile else "",
+                "experience": [{
+                    "title": e.title, "company": e.company, 
+                    "description": e.description, "achievements": e.achievements
+                } for e in experiences],
+                "skills": [{
+                    "category": s.category, "skills": s.skills
+                } for s in skills],
+                "projects": [{
+                    "name": p.name, "description": p.description, "technologies": p.technologies
+                } for p in projects],
+                 "education": [{
+                    "degree": edu.degree, "institution": edu.institution
+                } for edu in education]
+            }
+            candidate_info = json.dumps(candidate_data, indent=2)
+
         # Define tone-specific instructions
         tone_instructions = {
             "professional": "Use formal, corporate language. Be respectful and professional throughout.",
@@ -37,27 +90,29 @@ async def generate_cover_letter(request: CoverLetterRequest):
         tone_instruction = tone_instructions.get(request.tone, tone_instructions["professional"])
         
         # Create AI prompt
-        prompt = f"""Generate a professional cover letter for the following job application:
+        prompt = f"""Generate a highly personalized professional cover letter.
 
-Job Title: {request.job_title}
-Company: {request.company_name}
-Tone: {request.tone.capitalize()}
+        CANDIDATE PROFILE CONTEXT:
+        {candidate_info}
 
-Job Description:
-{request.job_description}
+        JOB APPLICATION DETAILS:
+        Job Title: {request.job_title}
+        Company: {request.company_name}
+        Tone: {request.tone.capitalize()}
+        
+        Job Description:
+        {request.job_description}
+        
+        Instructions:
+        - Write the letter AS the candidate defined above.
+        - MATCH the candidate's specific skills/experiences to the Job Description requirements.
+        - {tone_instruction}
+        - Keep it concise (3-4 paragraphs).
+        - Start with "Dear Hiring Manager,"
+        - End with "Sincerely," followed by the candidate's name (found in profile context).
+        - If the candidate data is empty, write a generic template but use brackets for placeholders.
 
-Instructions:
-- {tone_instruction}
-- Make it compelling and specific to the role
-- Highlight relevant skills and experience that match the job description
-- Keep it concise (3-4 paragraphs)
-- Include a strong opening and closing
-- Use proper business letter format
-- Do NOT include placeholder text like [Your Name] or [Date] - leave those sections blank or use generic text
-- Start with "Dear Hiring Manager,"
-- End with "Sincerely," followed by a blank line
-
-Generate ONLY the cover letter text, no additional commentary."""
+        Generate ONLY the cover letter text, no additional commentary."""
 
         # Call Gemini API
         ai_service = AIService()
@@ -66,6 +121,7 @@ Generate ONLY the cover letter text, no additional commentary."""
         return {"cover_letter": cover_letter}
         
     except Exception as e:
+        print(f"Cover letter error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate cover letter: {str(e)}")
 
 @router.post("/download")
