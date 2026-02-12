@@ -11,81 +11,54 @@
     </div>
 
     <!-- Templates Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
 
-        <!-- Template 1: Modern Clean (Current) -->
+        <!-- Professional Template (Only Template) -->
         <div class="glass-card overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
-            data-template="modern_clean">
+            data-template="professional">
             <div
-                class="aspect-[8.5/11] bg-gradient-to-br from-blue-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 p-6 relative">
+                class="aspect-[8.5/11] bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 p-6 border-l-2 border-slate-800 dark:border-slate-400 relative">
                 <div class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
                     Current
                 </div>
                 <div class="space-y-3">
-                    <div class="h-3 bg-primary/80 rounded w-3/4"></div>
-                    <div class="h-2 bg-slate-300 dark:bg-slate-600 rounded w-1/2"></div>
-                    <div class="mt-4 space-y-2">
-                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded"></div>
-                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded w-5/6"></div>
+                    <!-- Name -->
+                    <div class="h-4 bg-slate-800 dark:bg-slate-300 rounded w-2/3 font-bold"></div>
+                    <!-- Contact -->
+                    <div class="h-2 bg-slate-400 rounded w-1/2"></div>
+
+                    <!-- Section Title -->
+                    <div class="mt-6 h-2 bg-slate-800 dark:bg-slate-400 rounded w-1/3 border-b border-slate-800"></div>
+                    <!-- Content Lines -->
+                    <div class="space-y-1.5">
+                        <div class="h-1.5 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                        <div class="h-1.5 bg-slate-200 dark:bg-slate-600 rounded w-5/6"></div>
+                        <div class="h-1.5 bg-slate-200 dark:bg-slate-600 rounded w-4/5"></div>
                     </div>
-                    <div class="mt-4 space-y-2">
-                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded w-2/3"></div>
-                        <div class="h-2 bg-slate-200 dark:bg-slate-600 rounded"></div>
+
+                    <!-- Another Section -->
+                    <div class="mt-4 h-2 bg-slate-800 dark:bg-slate-400 rounded w-1/3 border-b border-slate-800"></div>
+                    <div class="space-y-1.5">
+                        <div class="h-1.5 bg-slate-200 dark:bg-slate-600 rounded w-4/5"></div>
+                        <div class="h-1.5 bg-slate-200 dark:bg-slate-600 rounded"></div>
                     </div>
                 </div>
             </div>
             <div class="p-4">
-                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Modern Clean</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Clean design with blue accents</p>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Professional</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Clean, ATS-friendly professional format</p>
                 <div class="flex gap-2">
                     <button
                         class="flex-1 bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors preview-btn">
                         Preview
                     </button>
                     <button
-                        class="flex-1 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors use-btn">
-                        Use Template
+                        class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-default">
+                        <i class="fa-solid fa-check mr-1"></i>Selected
                     </button>
                 </div>
             </div>
         </div>
-
-
-
-        <!-- Template 3: Minimal Elegant -->
-        <div class="glass-card overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
-            data-template="minimal_elegant">
-            <div
-                class="aspect-[8.5/11] bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 p-6 border-l-4 border-slate-800 dark:border-slate-400">
-                <div class="space-y-3">
-                    <div class="h-3 bg-slate-800 dark:bg-slate-300 rounded w-1/2"></div>
-                    <div class="h-1 bg-slate-400 rounded w-1/3"></div>
-                    <div class="mt-6 space-y-2">
-                        <div class="h-1 bg-slate-200 dark:bg-slate-600 rounded"></div>
-                        <div class="h-1 bg-slate-200 dark:bg-slate-600 rounded w-5/6"></div>
-                        <div class="h-1 bg-slate-200 dark:bg-slate-600 rounded w-4/5"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4">
-                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Minimal Elegant</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Clean minimal design</p>
-                <div class="flex gap-2">
-                    <button
-                        class="flex-1 bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors preview-btn">
-                        Preview
-                    </button>
-                    <button
-                        class="flex-1 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors use-btn">
-                        Use Template
-                    </button>
-                </div>
-            </div>
-        </div>
-
-
-
-
 
     </div>
 </div>

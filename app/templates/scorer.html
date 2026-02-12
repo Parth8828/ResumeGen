@@ -88,6 +88,14 @@
 
 {% block scripts %}
 <script>
+    // Configure marked.js for inline markdown
+    marked.setOptions({
+        breaks: true,
+        gfm: true,
+        headerIds: false,
+        mangle: false
+    });
+
     const form = document.getElementById('score-form');
     const analyzeBtn = document.getElementById('analyze-btn');
     const resultsArea = document.getElementById('results-area');
@@ -164,7 +172,9 @@
         if (items && items.length) {
             items.forEach(item => {
                 const li = document.createElement('li');
-                li.textContent = item;
+                li.className = 'prose prose-sm dark:prose-invert';
+                // Use parseInline for inline markdown (bold, italic, code, links)
+                li.innerHTML = marked.parseInline(item);
                 el.appendChild(li);
             });
         } else {

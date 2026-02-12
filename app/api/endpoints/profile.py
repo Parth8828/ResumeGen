@@ -5,6 +5,7 @@ from typing import List, Optional
 from app.db.database import get_db
 from app.models.models import UserProfile, Experience, Education, Skill, Project, ResumeHistory
 from datetime import datetime
+import json
 
 router = APIRouter()
 
@@ -19,6 +20,8 @@ class ProfileUpdate(BaseModel):
     github: Optional[str] = None
     portfolio: Optional[str] = None
     summary: Optional[str] = None
+    languages: Optional[str] = None  # JSON string
+    hobbies: Optional[str] = None    # JSON string
 
 class ExperienceCreate(BaseModel):
     title: str
@@ -104,7 +107,9 @@ async def get_profile(request: Request, db: Session = Depends(get_db)):
             "github": profile.github,
             "portfolio": profile.portfolio,
             "summary": profile.summary,
-            "selected_template": profile.selected_template
+            "languages": json.loads(profile.languages) if profile.languages else [],
+            "hobbies": json.loads(profile.hobbies) if profile.hobbies else [],
+            "selected_template": profile.selected_template,
         },
         "experiences": [
             {
@@ -175,6 +180,15 @@ async def update_profile(
     db.refresh(profile)
     
     return {"success": True, "message": "Profile updated successfully"}
+
+@router.post("/")
+async def update_profile_post(
+    request: Request,
+    profile_data: ProfileUpdate,
+    db: Session = Depends(get_db)
+):
+    """Update user's profile information (POST method for compatibility)"""
+    return await update_profile(request, profile_data, db)
 
 # Experience Endpoints
 

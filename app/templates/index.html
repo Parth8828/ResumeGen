@@ -79,17 +79,102 @@
         </a>
     </div>
 
-    <!-- Recent Activity Section (Placeholder) -->
+    <!-- Recent Activity Section -->
     <div class="mt-12">
         <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Recent Activity</h2>
-        <div class="glass-card p-8 text-center text-slate-500 dark:text-slate-400">
-            <div class="mb-4">
-                <i class="fa-regular fa-folder-open text-4xl text-slate-300"></i>
+        <div id="recent-activity-container">
+            <!-- Loading state -->
+            <div id="activity-loading" class="glass-card p-8 text-center text-slate-500 dark:text-slate-400">
+                <i class="fa-solid fa-spinner fa-spin text-3xl mb-4"></i>
+                <p>Loading recent activity...</p>
             </div>
-            <p>No resumes created yet. Start a chat to build one!</p>
-            <a href="/chat" class="inline-block mt-4 text-primary font-medium hover:text-blue-700">Start Building
-                &rarr;</a>
+
+            <!-- Empty state -->
+            <div id="activity-empty" class="glass-card p-8 text-center text-slate-500 dark:text-slate-400 hidden">
+                <div class="mb-4">
+                    <i class="fa-regular fa-folder-open text-4xl text-slate-300"></i>
+                </div>
+                <p>No resumes created yet. Start a chat to build one!</p>
+                <a href="/chat" class="inline-block mt-4 text-primary font-medium hover:text-blue-700">Start Building
+                    &rarr;</a>
+            </div>
+
+            <!-- Activity list -->
+            <div id="activity-list" class="space-y-4 hidden"></div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadRecentActivity() {
+        const loading = document.getElementById('activity-loading');
+        const empty = document.getElementById('activity-empty');
+        const list = document.getElementById('activity-list');
+
+        try {
+            const response = await axios.get('/api/profile/resume-history');
+            const data = response.data;
+            const resumes = data.resumes || data; // Handle both formats
+
+            loading.classList.add('hidden');
+
+            if (!resumes || resumes.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            // Show only the 5 most recent
+            const recentResumes = resumes.slice(0, 5);
+
+            list.innerHTML = recentResumes.map(resume => {
+                const date = new Date(resume.created_at);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const title = resume.title || resume.filename || 'Resume';
+
+                return `
+                    <div class="glass-card p-4 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 flex-1">
+                                <div class="h-10 w-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-slate-900 dark:text-slate-100">
+                                        ${title}
+                                    </h3>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                                        <i class="fa-regular fa-clock mr-1"></i>${formattedDate}
+                                        ${resume.template_used ? `<span class="ml-3"><i class="fa-solid fa-palette mr-1"></i>${resume.template_used}</span>` : ''}
+                                    </p>
+                                </div>
+                            </div>
+                            <a href="/api/profile/resume-history/${resume.id}/download" 
+                               class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                                <i class="fa-solid fa-download mr-1"></i>Download
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            list.classList.remove('hidden');
+        } catch (error) {
+            console.error('Failed to load recent activity:', error);
+            loading.classList.add('hidden');
+            empty.classList.remove('hidden');
+        }
+    }
+
+    // Load on page ready
+    document.addEventListener('DOMContentLoaded', loadRecentActivity);
+</script>
 {% endblock %}

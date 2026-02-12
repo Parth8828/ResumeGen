@@ -11,7 +11,7 @@ class ResumeGeneratorService:
     def __init__(self):
         pass
         
-    def generate_pdf(self, data: ResumeData, template_name: str = "modern_clean") -> str:
+    def generate_pdf(self, data: ResumeData, template_name: str = "professional") -> str:
         """
         Generates a PDF resume from data and returns the file path.
         """
@@ -26,7 +26,7 @@ class ResumeGeneratorService:
         except:
             # Fallback
             print(f"Template {template_name} not found, defaulting...")
-            template = templates.get_template("resume_templates/modern_clean.html")
+            template = templates.get_template("resume_templates/professional.html")
             
         # Prepare Context for Jinja (Adapter)
         context = data.dict()
@@ -34,12 +34,38 @@ class ResumeGeneratorService:
         # 1. Map full_name -> name
         context['name'] = context.get('full_name', '')
         
-        # 2. Adapt Skills (List of Strings -> Dict of Lists if needed)
-        # Template expects {% for category, skill_list in skills.items() %}
+        # 2. Skills - keep as list (template expects list, not dict)
         raw_skills = context.get('skills', [])
         if isinstance(raw_skills, list):
-             # Wrap flat list into a category
-             context['skills'] = {"Technical Skills": raw_skills} if raw_skills else {}
+            context['skills'] = raw_skills
+        else:
+            # If it's already a dict or other format, try to extract values
+            context['skills'] = list(raw_skills.values()) if isinstance(raw_skills, dict) else []
+        
+        # 3. Languages - parse from JSON string if needed
+        import json
+        raw_languages = context.get('languages', [])
+        if isinstance(raw_languages, str):
+            try:
+                context['languages'] = json.loads(raw_languages)
+            except:
+                context['languages'] = []
+        elif isinstance(raw_languages, list):
+            context['languages'] = raw_languages
+        else:
+            context['languages'] = []
+        
+        # 4. Hobbies - parse from JSON string if needed
+        raw_hobbies = context.get('hobbies', [])
+        if isinstance(raw_hobbies, str):
+            try:
+                context['hobbies'] = json.loads(raw_hobbies)
+            except:
+                context['hobbies'] = []
+        elif isinstance(raw_hobbies, list):
+            context['hobbies'] = raw_hobbies
+        else:
+            context['hobbies'] = []
              
         # Render with unpacked context
         html_content = template.render(**context)

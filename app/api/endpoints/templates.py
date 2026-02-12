@@ -71,11 +71,7 @@ SAMPLE_DATA = {
 }
 
 TEMPLATE_NAMES = {
-    "modern_clean": "Modern Clean",
-    "professional_blue": "Professional Blue",
-    "minimal_elegant": "Minimal Elegant",
-    "creative_bold": "Creative Bold",
-    "classic_traditional": "Classic Traditional"
+    "professional": "Professional"
 }
 
 @router.get("/list")
@@ -160,8 +156,8 @@ async def get_current_template(request: Request):
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    # Get template from session, default to modern_clean
-    current_template = request.session.get("selected_template", "modern_clean")
+    # Get template from session, default to professional
+    current_template = request.session.get("selected_template", "professional")
     
     return {
         "template_name": current_template,

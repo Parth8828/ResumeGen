@@ -186,6 +186,24 @@ async def chat_message(request_obj: Request, chat_req: ChatRequest, db: Session 
                         proj = Project(user_id=user_id, **proj_data)
                         db.add(proj)
             
+            # Add languages (merge with existing)
+            if 'languages' in extracted and extracted['languages']:
+                import json
+                current_languages = json.loads(profile.languages) if profile.languages else []
+                new_languages = extracted['languages']
+                # Merge and remove duplicates
+                merged_languages = list(set(current_languages + new_languages))
+                profile.languages = json.dumps(merged_languages)
+            
+            # Add hobbies (merge with existing)
+            if 'hobbies' in extracted and extracted['hobbies']:
+                import json
+                current_hobbies = json.loads(profile.hobbies) if profile.hobbies else []
+                new_hobbies = extracted['hobbies']
+                # Merge and remove duplicates
+                merged_hobbies = list(set(current_hobbies + new_hobbies))
+                profile.hobbies = json.dumps(merged_hobbies)
+            
             db.commit()
             print(f"✓ Auto-extracted and saved profile data: {list(extracted.keys())}")
     
@@ -202,6 +220,7 @@ async def chat_message(request_obj: Request, chat_req: ChatRequest, db: Session 
     skills = db.query(Skill).filter(Skill.user_id == user_id).all()
     projects = db.query(Project).filter(Project.user_id == user_id).all()
     
+    import json
     profile_data = {
         "full_name": current_profile.full_name if current_profile else "",
         "email": current_profile.email if current_profile else "",
@@ -211,15 +230,17 @@ async def chat_message(request_obj: Request, chat_req: ChatRequest, db: Session 
         "github": current_profile.github if current_profile else "",
         "portfolio": current_profile.portfolio if current_profile else "",
         "summary": current_profile.summary if current_profile else "",
-        "experience": [{"title": e.title, "company": e.company, "start_date": e.start_date, "end_date": e.end_date, "description": e.description} for e in experiences],
-        "education": [{"degree": e.degree, "institution": e.institution, "graduation_date": e.graduation_date} for e in education],
-        "skills": [s.category for s in skills] if skills else [], # Simplified for now, or elaborate
-        "projects": [{"name": p.name, "description": p.description} for p in projects]
+        "languages": json.loads(current_profile.languages) if current_profile and current_profile.languages else [],
+        "hobbies": json.loads(current_profile.hobbies) if current_profile and current_profile.hobbies else [],
+        "experience": [{"id": e.id, "title": e.title, "company": e.company, "start_date": e.start_date, "end_date": e.end_date} for e in experiences],
+        "education": [{"id": e.id, "degree": e.degree, "institution": e.institution} for e in education],
+        "skills": [{"id": s.id, "category": s.category, "skills": s.skills} for s in skills],
+        "projects": [{"id": p.id, "name": p.name, "description": p.description} for p in projects]
     }
-
+    
     return {
+        "response": ai_response_data.get("message", ""),
         "session_id": session.id,
-        "message": ai_response_text,
         "profile_data": profile_data, # Return updated profile
         "history": [{"role": m.role, "content": m.content} for m in history_msgs] + 
                    [{"role": "user", "content": chat_req.message}, {"role": "model", "content": ai_response_text}]

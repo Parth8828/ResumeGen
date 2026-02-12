@@ -1,0 +1,41 @@
+Yathesh Gamot 
+Phone: +91 6377418562 
+E-mail: yatheshgamotpc@gmail.com 
+Work Experience 
+TeckZilla Technologies LLP 
+Odoo Python Developer & Business Analytics(in 2025) 
+• Gathered and analyzed client requirements, translating business workflows into data-driven ERP process 
+models. 
+• Designed and developed ERP modules using Python, Odoo framework, and XML, automating tasks and 
+streamlining operations. 
+• Defined technical specifications and optimized database structures to improve performance and data integrity 
+• Implemented ERP solutions with custom dashboards, reporting, and analytics features for better decision-
+making. 
+• Delivered deployment, post-implementation support, and client training, ensuring effective ERP adoption and 
+business intelligence utilization. 
+Projects: - 
+Resume Generator Chatbot (Final Year Project – Ongoing, 2026) 
+• Developing a chatbot for resume creation, job recommendations, and course suggestions. 
+• Built using Python (Flask), NLP, MySQL with PDF generation templates. 
+Educational Qualifications: - 
+ 
+Technical Skills: - 
+ 
+• Programming: Python, SQL, R, XML 
+• Data Science: Machine Learning, Data Analysis, Data Visualization 
+• Databases: MySQL 
+• BI Tools: Power BI, Tableau. 
+• ERP & Frameworks: Odoo ERP (Python & XML customization, Module Development) 
+• Tools: Git/GitHub 
+B.Sc Data Science | 2026 
+Thakur College of Science and Commerce, 
+Mumbai 
+ 
+Average CGPA for 1st to 4th Semester : 7.5  
+ 
+Senior School Certificate |2023 
+74.00% 
+ 
+Secondary School Certificate |2021 
+87.00% 
+ 

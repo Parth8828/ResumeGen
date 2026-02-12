@@ -42,7 +42,7 @@ async def generate_resume_pdf(
 ):
     try:
         # Determine template
-        template_name = "modern_clean" # Default
+        template_name = "professional" # Default
         
         user_data = request.session.get("user")
         if user_data:
@@ -147,10 +147,10 @@ async def analyze_resume(
             "portfolio": profile.portfolio
         },
         "summary": profile.summary,
-        "experience": [{"id": e.id, "title": e.title, "company": e.company, "start_date": e.start_date, "end_date": e.end_date, "description": e.description, "achievements": json.loads(e.achievements) if e.achievements else []} for e in experiences],
+        "experience": [{"id": e.id, "title": e.title, "company": e.company, "start_date": e.start_date, "end_date": e.end_date, "description": e.description, "achievements": e.achievements or []} for e in experiences],
         "education": [{"id": e.id, "degree": e.degree, "institution": e.institution, "graduation_date": e.graduation_date, "gpa": e.gpa} for e in education],
-        "skills": [{"id": s.id, "category": s.category, "skills": json.loads(s.skills) if s.skills else []} for s in skills],
-        "projects": [{"id": p.id, "name": p.name, "description": p.description, "date": p.date, "technologies": json.loads(p.technologies) if p.technologies else []} for p in projects]
+        "skills": [{"id": s.id, "category": s.category, "skills": s.skills or []} for s in skills],
+        "projects": [{"id": p.id, "name": p.name, "description": p.description, "date": p.date, "technologies": p.technologies or []} for p in projects]
     }
 
     # 3. Call AI

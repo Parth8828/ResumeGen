@@ -186,22 +186,61 @@
         </div>
     </div>
 
-    <!-- Resume History -->
+    <!-- Languages -->
     <div class="glass-card p-6">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Resume History</h2>
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Languages</h2>
+        </div>
+        <div id="languages-view">
+            <div id="languages-list" class="flex flex-wrap gap-2 mb-4">
+                <!-- Languages will be loaded here -->
+            </div>
             <div class="flex gap-2">
-                <button id="filter-favorites-btn"
-                    class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
-                    <i class="fa-solid fa-star mr-1"></i>Favorites Only
+                <input type="text" id="language-input" placeholder="Add a language (e.g., English, Spanish)"
+                    class="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+                <button onclick="addLanguage()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+                    <i class="fa-solid fa-plus mr-1"></i>Add
                 </button>
             </div>
         </div>
+    </div>
 
-        <div id="resume-history-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Resume history will be loaded here -->
+    <!-- Hobbies -->
+    <div class="glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Hobbies & Interests</h2>
+        </div>
+        <div id="hobbies-view">
+            <div id="hobbies-list" class="flex flex-wrap gap-2 mb-4">
+                <!-- Hobbies will be loaded here -->
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="hobby-input" placeholder="Add a hobby (e.g., Photography, Hiking)"
+                    class="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100">
+                <button onclick="addHobby()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+                    <i class="fa-solid fa-plus mr-1"></i>Add
+                </button>
+            </div>
         </div>
     </div>
+</div>
+
+<!-- Resume History -->
+<div class="glass-card p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Resume History</h2>
+        <div class="flex gap-2">
+            <button id="filter-favorites-btn"
+                class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-star mr-1"></i>Favorites Only
+            </button>
+        </div>
+    </div>
+
+    <div id="resume-history-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Resume history will be loaded here -->
+    </div>
+</div>
 </div>
 
 <!-- Loading Indicator -->
@@ -519,6 +558,14 @@
 {% block scripts %}
 <script>
     let profileData = {};
+
+    // Utility function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     let currentEnhancement = null;
     let deleteState = { type: null, id: null };
 
@@ -857,10 +904,16 @@
             const summaryEl = document.getElementById('view-summary');
             if (summaryEl) summaryEl.textContent = p.summary || 'No summary added yet.';
 
+            // Ensure languages and hobbies are arrays
+            profileData.languages = profileData.profile?.languages || [];
+            profileData.hobbies = profileData.profile?.hobbies || [];
+
             renderExperiences();
             renderEducation();
             renderSkills();
             renderProjects();
+            renderLanguages();
+            renderHobbies();
             await loadResumeHistory();
 
         } catch (error) {
@@ -1005,6 +1058,126 @@
         }
     }
 
+    function renderLanguages() {
+        const container = document.getElementById('languages-list');
+        const languages = profileData.languages || [];
+
+        if (languages.length === 0) {
+            container.innerHTML = '<p class="text-slate-500 dark:text-slate-400">No languages added yet.</p>';
+            return;
+        }
+
+        container.innerHTML = languages.map(lang => `
+            <span class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-sm">
+                ${escapeHtml(lang)}
+                <button onclick="removeLanguage('${escapeHtml(lang)}')" class="hover:text-red-600">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </span>
+        `).join('');
+    }
+
+    function renderHobbies() {
+        const container = document.getElementById('hobbies-list');
+        const hobbies = profileData.hobbies || [];
+
+        if (hobbies.length === 0) {
+            container.innerHTML = '<p class="text-slate-500 dark:text-slate-400">No hobbies added yet.</p>';
+            return;
+        }
+
+        container.innerHTML = hobbies.map(hobby => `
+            <span class="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full text-sm">
+                ${escapeHtml(hobby)}
+                <button onclick="removeHobby('${escapeHtml(hobby)}')" class="hover:text-red-600">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </span>
+        `).join('');
+    }
+
+    // Add Language
+    window.addLanguage = async function () {
+        const input = document.getElementById('language-input');
+        const language = input.value.trim();
+
+        if (!language) return;
+
+        try {
+            const languages = profileData.languages || [];
+            if (languages.includes(language)) {
+                showToast('Language already added', 'error');
+                return;
+            }
+
+            languages.push(language);
+            await axios.post('/api/profile/', { languages: JSON.stringify(languages) });
+
+            profileData.languages = languages;
+            renderLanguages();
+            input.value = '';
+            showToast('Language added!', 'success');
+        } catch (error) {
+            console.error('Error adding language:', error);
+            showToast('Failed to add language', 'error');
+        }
+    }
+
+    // Remove Language
+    window.removeLanguage = async function (language) {
+        try {
+            const languages = (profileData.languages || []).filter(l => l !== language);
+            await axios.post('/api/profile/', { languages: JSON.stringify(languages) });
+
+            profileData.languages = languages;
+            renderLanguages();
+            showToast('Language removed', 'success');
+        } catch (error) {
+            showToast('Failed to remove language', 'error');
+        }
+    }
+
+    // Add Hobby
+    window.addHobby = async function () {
+        const input = document.getElementById('hobby-input');
+        const hobby = input.value.trim();
+
+        if (!hobby) return;
+
+        try {
+            const hobbies = profileData.hobbies || [];
+            if (hobbies.includes(hobby)) {
+                showToast('Hobby already added', 'error');
+                return;
+            }
+
+            hobbies.push(hobby);
+            await axios.post('/api/profile/', { hobbies: JSON.stringify(hobbies) });
+
+            profileData.hobbies = hobbies;
+            renderHobbies();
+            input.value = '';
+            showToast('Hobby added!', 'success');
+        } catch (error) {
+            console.error('Error adding hobby:', error);
+            showToast('Failed to add hobby', 'error');
+        }
+    }
+
+    // Remove Hobby
+    window.removeHobby = async function (hobby) {
+        try {
+            const hobbies = (profileData.hobbies || []).filter(h => h !== hobby);
+            await axios.post('/api/profile/', { hobbies: JSON.stringify(hobbies) });
+
+            profileData.hobbies = hobbies;
+            renderHobbies();
+            showToast('Hobby removed', 'success');
+        } catch (error) {
+            showToast('Failed to remove hobby', 'error');
+        }
+    }
+
     // Modal Helpers
     function openModal(id) {
         document.getElementById(id).classList.remove('hidden');
@@ -1132,6 +1305,7 @@
     }
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
+        setupEventListeners(); // Register all event handlers
         await loadProfile();
         await loadResumeHistory();
     });

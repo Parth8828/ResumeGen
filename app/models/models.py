@@ -22,6 +22,7 @@ class User(Base):
     skills = relationship("Skill", back_populates="user", cascade="all, delete-orphan")
     projects = relationship("Project", back_populates="user", cascade="all, delete-orphan")
     resume_history = relationship("ResumeHistory", back_populates="user", cascade="all, delete-orphan")
+    saved_jobs = relationship("SavedJob", cascade="all, delete-orphan")
 
 class Resume(Base):
     __tablename__ = "resumes"
@@ -79,8 +80,12 @@ class UserProfile(Base):
     # Professional Summary
     summary = Column(Text)
     
+    # Additional Sections
+    languages = Column(Text)  # JSON array of languages
+    hobbies = Column(Text)    # JSON array of hobbies
+    
     # Template Selection
-    selected_template = Column(String, default="modern_clean")
+    selected_template = Column(String, default="professional")
     
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -177,3 +182,28 @@ class ResumeHistory(Base):
     
     # Relationship
     user = relationship("User", back_populates="resume_history")
+
+class SavedJob(Base):
+    __tablename__ = "saved_jobs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    
+    # Job Details
+    title = Column(String)
+    company = Column(String)
+    location = Column(String)
+    url = Column(String)
+    remote = Column(Boolean, default=False)
+    description = Column(Text)
+    source = Column(String)  # arbeitnow, remotive, mock, etc.
+    
+    # Application Tracking
+    status = Column(String, default="saved")  # saved, applied, interviewing, rejected, offer
+    applied_date = Column(DateTime, nullable=True)
+    notes = Column(Text, nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+

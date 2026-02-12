@@ -5,7 +5,16 @@
 {% block content %}
 <div class="max-w-6xl mx-auto space-y-6">
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Job Recommendations</h1>
+        <div class="flex items-center justify-center gap-4 mb-2">
+            <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100">Job Recommendations</h1>
+            <button id="view-saved-btn"
+                class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-bookmark"></i>
+                <span>Saved Jobs</span>
+                <span id="saved-count-badge"
+                    class="hidden px-2 py-0.5 bg-primary text-white text-xs rounded-full">0</span>
+            </button>
+        </div>
         <p class="text-slate-600 dark:text-slate-300">Search for opportunities that match your profile.</p>
     </div>
 
@@ -39,6 +48,27 @@
         </form>
     </div>
 
+
+    <!-- Filter Controls -->
+    <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="remote-filter"
+                    class="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary dark:border-slate-600 dark:bg-slate-700">
+                <span class="text-sm text-slate-700 dark:text-slate-200">Remote Only</span>
+            </label>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600 dark:text-slate-400">Sort by:</span>
+            <select id="sort-select"
+                class="text-sm px-3 py-1.5 rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-primary focus:ring-primary">
+                <option value="relevance">Relevance</option>
+                <option value="remote">Remote First</option>
+                <option value="company">Company A-Z</option>
+            </select>
+        </div>
+    </div>
+
     <!-- Job List -->
     <div id="results-area" class="space-y-4">
         <div class="text-center py-12 text-slate-500 dark:text-slate-400">
@@ -57,6 +87,13 @@
     const locationInput = document.getElementById('job-location');
     const jobSuggestions = document.getElementById('job-suggestions');
     const locationSuggestions = document.getElementById('location-suggestions');
+    const remoteFilter = document.getElementById('remote-filter');
+    const sortSelect = document.getElementById('sort-select');
+    const viewSavedBtn = document.getElementById('view-saved-btn');
+    const savedCountBadge = document.getElementById('saved-count-badge');
+
+    let currentJobs = [];
+    let savedJobUrls = new Set();  // Track saved job URLs
 
     // Comprehensive job titles for suggestions (100+ options)
     const jobTitles = [
@@ -229,6 +266,7 @@
         }
     });
 
+    // Job search form submission
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = jobQueryInput.value;
@@ -242,14 +280,37 @@
                 location: location
             });
 
-            const jobs = response.data;
-            renderJobs(jobs);
+            currentJobs = response.data;
+            applyFiltersAndSort();
 
         } catch (error) {
             console.error(error);
             jobList.innerHTML = '<div class="text-center py-12 text-red-500 dark:text-red-400">Error fetching jobs. Please try again.</div>';
         }
     });
+
+    // Filter and sort handlers
+    remoteFilter.addEventListener('change', applyFiltersAndSort);
+    sortSelect.addEventListener('change', applyFiltersAndSort);
+
+    function applyFiltersAndSort() {
+        let filteredJobs = [...currentJobs];
+
+        // Apply remote filter
+        if (remoteFilter.checked) {
+            filteredJobs = filteredJobs.filter(job => job.remote);
+        }
+
+        // Apply sorting
+        const sortBy = sortSelect.value;
+        if (sortBy === 'remote') {
+            filteredJobs.sort((a, b) => (b.remote ? 1 : 0) - (a.remote ? 1 : 0));
+        } else if (sortBy === 'company') {
+            filteredJobs.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+        }
+
+        renderJobs(filteredJobs);
+    }
 
     function renderJobs(jobs) {
         jobList.innerHTML = '';
@@ -259,11 +320,17 @@
         }
 
         jobs.forEach(job => {
+            const sourceBadge = job.source ? `<span class="ml-2 px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-xs rounded-full">${job.source}</span>` : '';
+            const isSaved = savedJobUrls.has(job.url);
+
             const card = document.createElement('div');
             card.className = 'glass-card p-6 flex justify-between items-start hover:shadow-lg transition-shadow';
             card.innerHTML = `
-                <div>
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary mb-1">${job.title}</h3>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary">${job.title}</h3>
+                        ${sourceBadge}
+                    </div>
                     <div class="text-sm text-slate-600 dark:text-slate-300 mb-2">
                         <span class="font-semibold"><i class="fa-regular fa-building mr-1"></i> ${job.company}</span>
                         <span class="mx-2">•</span>
@@ -272,12 +339,174 @@
                     </div>
                     <div class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 max-w-2xl">${job.description}</div>
                 </div>
-                <a href="${job.url}" target="_blank" class="flex-shrink-0 ml-4 px-4 py-2 border border-primary text-primary dark:border-blue-400 dark:text-blue-400 rounded-lg hover:bg-primary hover:text-white dark:hover:bg-blue-600 transition-colors text-sm font-medium">
-                    Apply Now
-                </a>
+                <div class="flex gap-2 ml-4">
+                    <button 
+                        data-job-url="${job.url}"
+                        onclick='${isSaved ? `unsaveJob("${job.url}")` : `saveJob(${JSON.stringify(job).replace(/'/g, "\\'").replace(/"/g, '&quot;')})`}'
+                        class="flex-shrink-0 px-4 py-2 ${isSaved ? 'bg-primary text-white' : 'border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'} rounded-lg transition-colors font-medium">
+                        ${isSaved ? '<i class="fa-solid fa-bookmark"></i>' : '<i class="fa-regular fa-bookmark"></i>'}
+                    </button>
+                    <a href="${job.url}" target="_blank"
+                        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        View Job
+                    </a>
+                </div>
             `;
             jobList.appendChild(card);
         });
     }
+
+    function searchForJob(jobTitle) {
+        jobQueryInput.value = jobTitle;
+        form.dispatchEvent(new Event('submit'));
+        window.scrollTo({ top: document.getElementById('results-area').offsetTop - 100, behavior: 'smooth' });
+    }
+
+    // Load saved jobs on page load
+    loadSavedJobsCount();
+
+    // View saved jobs button
+    viewSavedBtn.addEventListener('click', showSavedJobs);
+
+    async function loadSavedJobsCount() {
+        try {
+            const response = await axios.get('/api/jobs/saved');
+            const savedJobs = response.data;
+            savedJobUrls = new Set(savedJobs.map(job => job.url));
+
+            if (savedJobs.length > 0) {
+                savedCountBadge.textContent = savedJobs.length;
+                savedCountBadge.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error loading saved jobs count:', error);
+        }
+    }
+
+    async function saveJob(job) {
+        try {
+            const response = await axios.post('/api/jobs/save', job);
+            if (response.data.message) {
+                savedJobUrls.add(job.url);
+                loadSavedJobsCount();
+                // Update button UI
+                const saveBtn = document.querySelector(`button[data-job-url="${job.url}"]`);
+                if (saveBtn) {
+                    saveBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> Saved';
+                    saveBtn.classList.remove('border-primary', 'text-primary', 'hover:bg-primary');
+                    saveBtn.classList.add('bg-primary', 'text-white');
+                }
+            }
+        } catch (error) {
+            console.error('Error saving job:', error);
+            alert('Error saving job. Please try again.');
+        }
+    }
+
+    async function unsaveJob(jobUrl) {
+        try {
+            // Find job ID from saved jobs
+            const savedResponse = await axios.get('/api/jobs/saved');
+            const savedJob = savedResponse.data.find(j => j.url === jobUrl);
+
+            if (savedJob) {
+                await axios.delete(`/api/jobs/unsave/${savedJob.id}`);
+                savedJobUrls.delete(jobUrl);
+                loadSavedJobsCount();
+
+                // Update button UI
+                const saveBtn = document.querySelector(`button[data-job-url="${jobUrl}"]`);
+                if (saveBtn) {
+                    saveBtn.innerHTML = '<i class="fa-regular fa-bookmark"></i> Save';
+                    saveBtn.classList.remove('bg-primary', 'text-white');
+                    saveBtn.classList.add('border-primary', 'text-primary', 'hover:bg-primary');
+                }
+            }
+        } catch (error) {
+            console.error('Error unsaving job:', error);
+        }
+    }
+
+    async function showSavedJobs() {
+        try {
+            const response = await axios.get('/api/jobs/saved');
+            const savedJobs = response.data;
+
+
+            if (savedJobs.length === 0) {
+                showToast('No jobs saved yet. Start saving jobs to track your applications!', 'info');
+                return;
+            }
+
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-slate-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Saved Jobs (${savedJobs.length})</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                            <i class="fa-solid fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="overflow-y-auto p-6 space-y-4">
+                        ${savedJobs.map(job => `
+                            <div class="glass-card p-6">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">${job.title}</h3>
+                                        <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                                            <i class="fa-regular fa-building mr-1"></i> ${job.company} • ${job.location}
+                                            ${job.remote ? '<span class="ml-2 px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full">Remote</span>' : ''}
+                                        </p>
+                                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">${job.description}</p>
+                                        <div class="mt-3 flex items-center gap-2">
+                                            <span class="text-xs px-2 py-1 rounded-full ${job.status === 'saved' ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400' :
+                    job.status === 'applied' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' :
+                        job.status === 'interviewing' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300' :
+                            job.status === 'offer' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' :
+                                'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+                }">
+                                                ${job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                                            </span>
+                                            ${job.applied_date ? `<span class="text-xs text-slate-500 dark:text-slate-400">Applied: ${new Date(job.applied_date).toLocaleDateString()}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <a href="${job.url}" target="_blank" class="px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">
+                                            View
+                                        </a>
+                                        <button onclick="unsaveJobFromModal(${job.id}, this)" class="px-3 py-1.5 border border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white text-sm">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Close on outside click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        } catch (error) {
+            console.error('Error loading saved jobs:', error);
+            alert('Error loading saved jobs');
+        }
+    }
+
+    window.unsaveJobFromModal = async function (jobId, button) {
+        try {
+            await axios.delete(`/api/jobs/unsave/${jobId}`);
+            button.closest('.glass-card').remove();
+            loadSavedJobsCount();
+        } catch (error) {
+            console.error('Error removing job:', error);
+        }
+    };
+
 </script>
 {% endblock %}

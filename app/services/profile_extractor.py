@@ -89,7 +89,9 @@ Extract and return a JSON object with ANY of these fields that are mentioned:
       "url": "string (optional)",
       "technologies": ["string", "string"]
     }}
-  ]
+  ],
+  "languages": ["string", "string"],
+  "hobbies": ["string", "string"]
 }}
 
 EXAMPLES:
@@ -161,7 +163,7 @@ Return ONLY valid JSON, no explanations."""
             merged['summary'] = new_data['summary']
         
         # Merge lists - append new items
-        for list_field in ['experience', 'education', 'skills', 'projects']:
+        for list_field in ['experience', 'education', 'skills', 'projects', 'languages', 'hobbies']:
             if list_field in new_data and new_data[list_field]:
                 if list_field not in merged:
                     merged[list_field] = []
